@@ -5,15 +5,21 @@
  */
 package SI2;
 
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.draw.DottedLineSeparator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import static java.lang.Float.parseFloat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
@@ -31,6 +37,7 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+ 
 
 /**
  *
@@ -43,6 +50,8 @@ public class SI2 {
     private static XSSFWorkbook workbook;
     private static String nombreArchivo;
     private static XSSFSheet sheet;
+    private static XSSFSheet sheet2;
+    
     private static ArrayList<String> correos; 
     private static ArrayList<Trabajador> listaTrabajadores;
     private static int nCu;
@@ -52,7 +61,7 @@ public class SI2 {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws IOException, ParseException {
+    public static void main(String[] args) throws IOException, ParseException, DocumentException {
         
         System.out.println("Introduce mes y año: (MM/AAAA)");
         Scanner scan = new Scanner(System.in);
@@ -66,6 +75,7 @@ public class SI2 {
         String fileName = "empleados.xml";
         String fileName2 = "cuentas.xml";
         ArrayList sheetData = new ArrayList();
+        ArrayList sheetData2 = new ArrayList();
         doc = new Document();
         doc.setRootElement(new Element("Empleados",  Namespace.getNamespace("https://www.journaldev.com/employees")));
         doc2 = new Document();
@@ -75,6 +85,7 @@ public class SI2 {
             workbook = new XSSFWorkbook(file);
             workbook.setMissingCellPolicy(Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
             sheet = workbook.getSheetAt(0);
+            sheet2 = workbook.getSheetAt(1);
             Iterator rows = sheet.rowIterator();
             while(rows.hasNext()){
                 XSSFRow row = (XSSFRow) rows.next();
@@ -88,11 +99,24 @@ public class SI2 {
                 }
                 sheetData.add(data);
             }
+            Iterator rows2=sheet2.rowIterator();
+            while(rows2.hasNext()){
+                XSSFRow row2 = (XSSFRow) rows2.next();
+                ArrayList data2 = new ArrayList();
+                
+                for(int i =0;i<row2.getLastCellNum();i++){
+                    XSSFCell cell2 = row2.getCell(i);
+                    if(cell2==null)
+                        cell2=row2.createCell(i);
+                    data2.add(cell2);
+                }
+                sheetData2.add(data2);
+            }
             file.close(); //Cerramos el archivo
         }catch(IOException e){
             e.printStackTrace();
         }
-        showData(sheetData);
+        showData(sheetData,sheetData2);
         XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
         try{
             xmlOutputter.output(doc, new FileOutputStream(fileName));
@@ -101,9 +125,8 @@ public class SI2 {
             System.err.println("Capturada excepcion!");
         }
         
-        for(Trabajador s:listaTrabajadores){
-            System.out.println(s.toString());
-        }
+        createPdf("pruebaProrrata.pdf", listaTrabajadores.get(2));
+        createPdf("pruebaSinProra.pdf", listaTrabajadores.get(6));
         //TODO PEDIR POR CONSOLA EL AÃ‘O Y MES DEL QUE SE DESEAN GENERAR LAS NÃ“MINAS
         // DE ESTA FORMA: mm/aaaa
         
@@ -122,7 +145,7 @@ public class SI2 {
         
     }
     
-    private static void showData(List sheetData) throws IOException, ParseException{
+    private static void showData(List sheetData, List sheetData2) throws IOException, ParseException{
         ArrayList<String> listaNifs = new ArrayList<String>();
         for(int i = 1; i< sheetData.size(); i++){
             List list = (List) sheetData.get(i);
@@ -199,9 +222,26 @@ public class SI2 {
                 }
                 trab.setFechaAltaEmpresa(fechaAlta.getDateCellValue());
                 trab.calculateTrienios(fecha);
+                //TODO Aquí empece a poner cosas y crear métodos
+                trab.setSalario(calculaSalario(categoria.toString(), sheetData2));
+                trab.setBrutoAnual(calculaBrutoAnual(categoria.toString(), sheetData2));
+                trab.setComplementos(calculaComplementos(categoria.toString(), sheetData2));
+                trab.setAntiguedad(calculaCompTrienio(trab.getTrienios(), sheetData2));
+                trab.setCodCotizacion(calculaCodCotizacion(categoria.toString(), sheetData2));
+                float prorrat=calcularProrrateo(trab.hasProrrateo(), trab.getSalario(), trab.getComplementos(), trab.getAntiguedad());
+                trab.setProrrateo(prorrat);
+                trab.setDescuentos(calcularDescuentos(trab.getBrutoAnual()));
+                trab.setContingencias(calcularContingencias(trab.getBrutoAnual()));
+                trab.setDesempleo(calcularDesempleo(trab.getBrutoAnual()));
+                trab.setIRPF(calcularIRPF(trab.getBrutoAnual()));
+                trab.setPorcIRPF(calcularRetencion(trab.getBrutoAnual(),sheetData2));
+                trab.setFormacion(calcularFormacion(trab.getBrutoAnual()));
+                trab.setPagosEmpresario(calcularPagosEmpresario(trab.getBrutoAnual()));
+                
                 listaTrabajadores.add(trab);
 
                 write(i, 4, correo);
+                
             }
             
         }
@@ -301,7 +341,7 @@ public class SI2 {
         return String.valueOf(dniSinLetra) + letraFinal;
        
    }
-   
+  
     private static String calculaCorreo(String nombre, String apellido1, String apellido2, String nombreEmpresa){
         String correo=nombre.substring(0,3)+apellido1.substring(0,2);
         if(apellido2!=""){
@@ -568,6 +608,7 @@ public class SI2 {
         employee.addContent(new Element("IBAN").setText(iban));
         doc.getRootElement().addContent(employee);
     }
+   
     //FunciÃ³n que escribe en el excel (Fila, columna, texto)
     private static void write(int fila, int columna, String text){
         if(fila<0 || columna<0){
@@ -588,4 +629,344 @@ public class SI2 {
             System.err.println("Error");
         } 
     }
+
+    private static float calculaSalario(String categoria, List sheetData2) {
+        for(int i = 1; i< sheetData2.size(); i++){
+            List list = (List) sheetData2.get(i);
+            Cell salarCell = (Cell) list.get(1);
+            Cell categCell = (Cell) list.get(0);
+            if(categoria.equals(categCell.toString())){
+                return parseFloat(salarCell.toString())/14;
+            }
+        }
+        return 0;
+    }
+
+    private static float calculaComplementos(String categoria, List sheetData2) {
+        for(int i = 1; i< sheetData2.size(); i++){
+            List list = (List) sheetData2.get(i);
+            Cell salarCell = (Cell) list.get(2);
+            Cell categCell = (Cell) list.get(0);
+            if(categoria.equals(categCell.toString())){
+                return parseFloat(salarCell.toString())/14;
+            }
+        }
+        return 0;
+    }
+    private static float calculaCompTrienio(int trienios, List sheetData2) {
+        if(trienios<=0)
+            return 0;
+        if(trienios==1) //TODO: BUG: no se por que, con 1 trienio pone el maximo importe... de momento lo hardcodeamos así
+            return 15;
+        float compT=0;
+        for(int i = 18; i< 36; i++){
+            List list = (List) sheetData2.get(i);
+            Cell trieCell = (Cell) list.get(3);
+            Cell pagoCell = (Cell) list.get(4);
+            if(Integer.parseInt(trieCell.toString().substring(0,1))==trienios){
+                compT=(float) pagoCell.getNumericCellValue();
+            }
+        }
+        return compT;
+    }
+    private static float calcularProrrateo(boolean prorrata, float salario, float complemento, float antiguedad) {
+        if(!prorrata)         
+            return 0;
+        return (salario)/6+(complemento)/6+(antiguedad)/6;
+    }
+    private static float calcularRetencion(float brutoAnual, List sheetData2) {
+        
+        //Calculamos la retención
+        String brutoAnualStr=String.valueOf(brutoAnual);
+        float total=0;
+        for(int i = 1; i< sheetData2.size(); i++){
+            List list = (List) sheetData2.get(i);
+            Cell salarCell = (Cell) list.get(6);
+            Cell categCell = (Cell) list.get(5);
+            
+            if(brutoAnualStr.equals(categCell.toString())){
+                total=total+Float.parseFloat(salarCell.toString());
+                return total;
+            }
+        }
+        
+        return total;
+    }
+    private static float calcularDescuentos(float brutoAnual) {
+        float descuentoTotal=0;
+        //IRPF 12.08%
+        descuentoTotal+=(brutoAnual/12)*(12.08)/100;
+        //Seguridad Social 4.7%
+        descuentoTotal+=(brutoAnual/12)*(4.7)/100;
+        //Desempleo 1.6%
+        descuentoTotal+=(brutoAnual/12)*(1.6)/100;
+        //Formacion 0.1
+        descuentoTotal+=(brutoAnual/12)*(0.1)/100;
+        
+        return descuentoTotal;
+    }
+
+    private static float calculaBrutoAnual(String categoria, List sheetData2) {
+        for(int i = 1; i< sheetData2.size(); i++){
+            List list = (List) sheetData2.get(i);
+            Cell salarCell = (Cell) list.get(1);
+            Cell categCell = (Cell) list.get(0);
+            if(categoria.equals(categCell.toString())){
+                return parseFloat(salarCell.toString());
+            }
+        }
+        return 0;
+    }
+
+    private static String calculaCodCotizacion(String categoria, List sheetData2) {
+        for(int i = 1; i< sheetData2.size(); i++){
+            List list = (List) sheetData2.get(i);
+            Cell salarCell = (Cell) list.get(3);
+            Cell categCell = (Cell) list.get(0);
+            if(categoria.equals(categCell.toString())){
+                return salarCell.toString().substring(0, 1);
+            }
+        }
+        return "Error";
+    }
+
+    private static float calcularPagosEmpresario(float brutoAnual) {
+        float total=0;
+        //Salario bruto anual
+        total+=brutoAnual;
+        //Seguridad Social 4.7%
+        total+=(brutoAnual/12)*(4.7)/100;
+        //FOGASA
+        total+=(brutoAnual/12)*(0.2)/100;
+        //Desempleo 1.6%
+        total+=(brutoAnual/12)*(1.6)/100;
+        //Formacion 0.1
+        total+=(brutoAnual/12)*(0.1)/100;
+        
+        
+        return total;
+    }
+
+    private static float calcularContingencias(float brutoAnual) {
+        return (float) ((brutoAnual/12)*(4.7)/100);
+    }
+
+    private static float calcularIRPF(float brutoAnual) {
+        return (float) ((brutoAnual/12)*(12.08)/100);
+    }
+
+    private static float calcularFormacion(float brutoAnual) {
+        return (float) ((brutoAnual/12)*(0.1)/100);
+        
+       
+    }
+    private static float calcularDesempleo(float brutoAnual) {
+        return (float) ((brutoAnual/12)*(1.6)/100);
+        
+    }
+    
+    public static PdfPTable createFirstTable(Trabajador trabajador) {
+    	// a table with three columns
+        PdfPTable table = new PdfPTable(5);
+        // the cell object
+        PdfPCell cell;
+        // we add a cell with colspan 3
+        cell = new PdfPCell(new Phrase("Nomina de " + fecha));
+        cell.setColspan(5);
+        table.addCell(cell);
+        // now we add a cell with rowspan 2
+        cell = new PdfPCell(new Phrase(""));
+        table.addCell(cell);
+        // we add the four remaining cells with addCell()
+        table.addCell("cant");
+        table.addCell("Imp. Unit");
+        table.addCell("Dev.");
+        table.addCell("Deduc.");
+        
+        table.addCell("Salario Base");
+        table.addCell("30 dias");
+        table.addCell(String.valueOf(trabajador.getSalario()/30));
+        table.addCell(String.valueOf(trabajador.getSalario()));
+        table.addCell("");
+        
+        
+        
+        table.addCell("Prorrata");
+        table.addCell("30 dias");
+        if(trabajador.hasProrrateo()){
+            table.addCell(String.valueOf(trabajador.getProrrateo()/30));
+            table.addCell(String.valueOf(trabajador.getProrrateo()));
+        }
+        else{
+            table.addCell(" ");
+            table.addCell(" ");
+        }
+        table.addCell("");
+        
+        
+        table.addCell("Complento");
+        table.addCell("30 dias");
+        table.addCell(String.valueOf(trabajador.getComplementos()/30));
+        table.addCell(String.valueOf(trabajador.getComplementos()));
+        table.addCell("");
+        
+        
+        table.addCell("Antiguedad");
+        table.addCell(String.valueOf(trabajador.getTrienios()) + " trienios.");
+        table.addCell(String.valueOf(trabajador.getAntiguedad()/30));
+        table.addCell(String.valueOf(trabajador.getAntiguedad()));
+        table.addCell("");
+        float devengoTotal;
+        if(trabajador.hasProrrateo()){
+            devengoTotal=trabajador.getAntiguedad()+trabajador.getComplementos()+trabajador.getProrrateo()+trabajador.getSalario();
+        }
+        else{
+            devengoTotal=trabajador.getAntiguedad()+trabajador.getComplementos()+trabajador.getSalario();
+        }
+        
+        cell = new PdfPCell(new Phrase(" "));
+        cell.setColspan(5);
+        table.addCell(cell);
+        
+        table.addCell("Contingencias Generales");
+        table.addCell("4.7%");
+        table.addCell("de "+devengoTotal);
+        table.addCell("");
+        table.addCell(String.valueOf(trabajador.getContingencias()));
+        
+        table.addCell("Desempleo");
+        table.addCell("1.6%");
+        table.addCell("de "+devengoTotal);;
+        table.addCell("");
+        table.addCell(String.valueOf(trabajador.getDesempleo()));
+        
+        table.addCell("Cuota formación");
+        table.addCell("0.1%");
+        table.addCell("de "+devengoTotal);;
+        table.addCell("");
+        table.addCell(String.valueOf(trabajador.getFormacion()));
+        
+        table.addCell("IRPF");
+        table.addCell(String.valueOf(trabajador.getPorcIRPF()));
+        table.addCell("de "+devengoTotal);;
+        table.addCell("");
+        float descuentoTotal=(devengoTotal*(trabajador.getPorcIRPF()/100))+trabajador.getFormacion()+trabajador.getDesempleo()+trabajador.getContingencias();
+        table.addCell(String.valueOf(devengoTotal*(trabajador.getPorcIRPF()/100)));
+        
+        cell = new PdfPCell(new Phrase(" "));
+        cell.setColspan(5);
+        table.addCell(cell);
+        
+        cell = new PdfPCell(new Phrase("Total Deducciones"));
+        cell.setColspan(4);
+        table.addCell(cell);
+        table.addCell(String.valueOf(trabajador.getDescuentos()));
+        
+        cell = new PdfPCell(new Phrase("Total Dev"));
+        cell.setColspan(3);
+        table.addCell(cell);
+        cell = new PdfPCell(new Phrase(String.valueOf(trabajador.getSalario() + trabajador.getProrrateo()+trabajador.getAntiguedad()+trabajador.getComplementos())));
+        cell.setColspan(2);
+        table.addCell(cell);
+        
+        cell = new PdfPCell(new Phrase("Líquido a Percibir"));
+        cell.setColspan(4);
+        table.addCell(cell); 
+        table.addCell(String.valueOf(devengoTotal-descuentoTotal));
+
+        return table;
+    }
+    
+    public static void createPdf(String filename, Trabajador employee)
+        throws IOException, DocumentException {
+        
+        
+        
+        
+    	// step 1
+        com.itextpdf.text.Document document = new com.itextpdf.text.Document();
+        // step 2
+        PdfWriter.getInstance(document, new FileOutputStream(filename));
+        // step 3
+        document.open();
+        Paragraph infoEmpresa = new Paragraph("info empresa\n");
+        Paragraph infoEmpleado = new Paragraph(employee.toString());
+        document.add(infoEmpresa);
+        document.add(infoEmpleado);
+        // step 410/
+        document.add(createFirstTable(employee));
+        document.add(createSecondTable(employee));
+        // step 5
+        document.close();
+    }
+
+    private static com.itextpdf.text.Element createSecondTable(Trabajador trabajador) {
+        // a table with three columns
+        PdfPTable table = new PdfPTable(5);
+        // the cell object
+        PdfPCell cell;
+        // we add a cell with colspan 3
+        cell = new PdfPCell(new Phrase("Cálculo de coste para el empresario"));
+        cell.setColspan(5);
+        table.addCell(cell);
+        // now we add a cell with rowspan 2
+        cell = new PdfPCell(new Phrase(""));
+        table.addCell("Calculo base");
+        // we add the four remaining cells with addCell()
+        table.addCell("");
+        table.addCell("");
+        table.addCell("");
+        float devengos;
+        if(trabajador.hasProrrateo()){
+            devengos=trabajador.getAntiguedad()+trabajador.getComplementos()+trabajador.getProrrateo()+trabajador.getSalario();
+        }
+        else{
+            devengos=trabajador.getAntiguedad()+trabajador.getComplementos()+trabajador.getSalario();
+        }
+        table.addCell(String.valueOf(devengos));
+        
+        cell = new PdfPCell(new Phrase("Contingencias comunes 23.60%"));
+        cell.setColspan(4);
+        table.addCell(cell);
+        table.addCell(String.valueOf(devengos*23.60/100));
+         
+        cell = new PdfPCell(new Phrase("Desempleo 6.7%"));
+        cell.setColspan(4);
+        table.addCell(cell);
+        table.addCell(String.valueOf(devengos*6.7/100)); 
+        
+        cell = new PdfPCell(new Phrase("Formación 0.6%"));
+        cell.setColspan(4);
+        table.addCell(cell);
+        table.addCell(String.valueOf(devengos*0.6/100)); 
+        
+        cell = new PdfPCell(new Phrase("Accidentes de trabajo 1.0%"));
+        cell.setColspan(4);
+        table.addCell(cell);
+        table.addCell(String.valueOf(devengos/100));
+         
+        cell = new PdfPCell(new Phrase("FOGASA 2%"));
+        cell.setColspan(4);
+        table.addCell(cell);
+        table.addCell(String.valueOf(devengos*2/100));
+         
+        cell = new PdfPCell(new Phrase("TOTAL EMPRESARIO"));
+        cell.setColspan(4);
+        table.addCell(cell);
+        table.addCell(String.valueOf(devengos*23.60/100+devengos*6.7/100+devengos*0.6/100+devengos/100+devengos*2/100));
+        
+        cell = new PdfPCell(new Phrase("Coste total del trabajador"));
+        cell.setColspan(4);
+        table.addCell(cell);
+        table.addCell(String.valueOf(devengos*23.60/100+devengos*6.7/100+devengos*0.6/100+devengos/100+devengos*2/100+devengos));
+        
+        return table;
+    }
+
+    
+
+    
+
+    
+   
 }

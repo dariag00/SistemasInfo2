@@ -24,18 +24,33 @@ public class Trabajador {
     private String categoria;
     private String cuenta;
     private float salario;
+    private float complementos;
+    private float antiguedad;
+    private float prorrateo;
+    private float descuentos;
+    private float contingencias;
+    private float desempleo;
+    private float formacion;
+    private float irpf;
+    private float pagos;
+    private float brutoAnual;
+    private float retencion;
+    private float pagosEmpresario;
+    private float porcIRPF;
     private Date fechaAltaEmpresa;
-    private int horasExtrasForzadas;
-    private int horasExtrasVoluntarias;
+    private String codCotizacion;
     private boolean prorrata;
     private String pais;
     private String correo;
     private String iban;
     private int id;
+    
+    
+    
     private int trienios;
     
     public Trabajador(){
-        
+        this.apellido2 = "";
     }
     
     public void setId(int id){
@@ -96,6 +111,12 @@ public class Trabajador {
     public String getNombreEmpresa() {
         return nombreEmpresa;
     }
+    public float getRetencion(){
+        return retencion;
+    }
+    public void setRetencion(float retencion){
+        this.retencion=retencion;
+    }
 
     public void setNombreEmpresa(String nombreEmpresa) {
         this.nombreEmpresa = nombreEmpresa;
@@ -133,6 +154,40 @@ public class Trabajador {
     public void setSalario(float salario) {
         this.salario = salario;
     }
+    
+    public float getComplementos(){
+        return complementos;
+    }
+    
+    public void setComplementos(float complementos){
+        this.complementos=complementos;
+        
+    }
+    
+    public float getProrrateo(){
+        return prorrateo;
+    }
+    
+    public void setProrrateo(float prorrateo){
+        this.prorrateo=prorrateo;
+        
+    }
+    public float getDescuentos(){
+        return descuentos;
+    }
+    
+    public void setDescuentos(float descuentos){
+        this.descuentos=descuentos;
+        
+    }
+    public float getPagos(){
+        return pagos;
+    }
+    
+    public void setPagos(float pagos){
+        this.pagos=pagos;
+        
+    }
 
     public Date getFechaAltaEmpresa() {
         return fechaAltaEmpresa;
@@ -144,21 +199,14 @@ public class Trabajador {
         
     }
 
-    public int getHorasExtrasForzadas() {
-        return horasExtrasForzadas;
+    public String getCodCotizacion() {
+        return codCotizacion;
     }
 
-    public void setHorasExtrasForzadas(int horasExtrasForzadas) {
-        this.horasExtrasForzadas = horasExtrasForzadas;
+    public void setCodCotizacion(String codCotizacion) {
+        this.codCotizacion = codCotizacion;
     }
 
-    public int getHorasExtrasVoluntarias() {
-        return horasExtrasVoluntarias;
-    }
-
-    public void setHorasExtrasVoluntarias(int horasExtrasVoluntarias) {
-        this.horasExtrasVoluntarias = horasExtrasVoluntarias;
-    }
 
     public boolean isProrrata() {
         return prorrata;
@@ -175,10 +223,61 @@ public class Trabajador {
     public void setPais(String pais) {
         this.pais = pais;
     }
-    
-    public int calculateSalary(){
-        return 0;
+    public int getTrienios(){
+        return this.trienios;
     }
+    public void setAntiguedad(float ant){
+        this.antiguedad=ant;
+    }
+    public float getAntiguedad(){
+        return this.antiguedad;
+    }
+    public boolean hasProrrateo(){
+        return this.prorrata;
+    }
+    public void setBrutoAnual(float brutoAnual) {
+        this.brutoAnual=brutoAnual;
+    }
+    public float getBrutoAnual(){
+        return this.brutoAnual;
+    }
+    public float getPagosEmpresario(){
+        return this.pagosEmpresario;
+    }
+    public void setPagosEmpresario(float pagosEmpresario){
+        this.pagosEmpresario=pagosEmpresario;
+    }
+    public void setContingencias(float contingencias){
+        this.contingencias=contingencias;
+    }
+    public void setIRPF(float IRPF){
+        this.irpf=IRPF;
+    }
+    public void setDesempleo(float desempleo){
+        this.desempleo=desempleo;
+    }
+    public void setFormacion(float formacion){
+        this.formacion=formacion;
+    }
+    public float getFormacion(){
+        return formacion;
+    }
+    public float getDesempleo(){
+        return desempleo;
+    }
+    public float getIRPF(){
+        return irpf;
+    }
+    public float getContingencias(){
+        return contingencias;
+    }
+    public float getPorcIRPF(){
+        return porcIRPF;
+    }
+    public void setPorcIRPF(float porcIRPF){
+        this.porcIRPF=porcIRPF;
+    }
+    
     
     public void calculateTrienios(String fecha) throws ParseException{
         
@@ -186,19 +285,32 @@ public class Trabajador {
         //System.out.println(today.toString() + contratado.toString());
         long milliseconds = today.getTime() - fechaAltaEmpresa.getTime();
         double division =   milliseconds / 94608;
-        this.trienios = (int) Math.floor(division/1000000);
-    }
+        int trie=(int) Math.floor(division/1000000);
+        if(trie<=0)
+            this.trienios=0;
+        else
+            this.trienios=trie;
+    }   
     
     public String toString(){
         StringBuilder builder = new StringBuilder();
-        builder.append("ID: " + id + " Nombre:" + nombre + " Apellidos: " + apellido1 + " " + apellido2);
-        builder.append(" DNI: " + DNI);
-        builder.append(" Categoria " + categoria);
-        builder.append(" FA: " + fechaAltaEmpresa + " Prorrata " + prorrata);
-        builder.append(" TR: " + this.trienios);
+        
+        
+        builder.append("IBAN: " + getIban()+ "\n");
+        builder.append("Categoria: " + getCategoria()+ "\n");
+        builder.append("Bruto Anual: " + getBrutoAnual()+ "\n");
+        builder.append("Fecha Alta: " + getFechaAltaEmpresa()+ "\n");
+        builder.append("----------------------------------\n");
+        
+        builder.append(getDNI()+ "\n");
+        builder.append(getNombre()+ " " + getApellido1() + " " + getApellido2() + "\n");            
+        builder.append("\n");
         
         return builder.toString();
     }
+    
+    
+
     
     
     

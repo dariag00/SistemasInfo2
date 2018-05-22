@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Empleados xmlns="https://www.journaldev.com/employees">
+  <Empleados xmlns="" id="2">
+    <NIF>9924125Q</NIF>
+    <Apellidos>Ahmed Ahmed</Apellidos>
+    <Nombre>Mohamed</Nombre>
+  </Empleados>
+  <Empleados xmlns="" id="11">
+    <NIF>11337652D</NIF>
+    <Apellidos>Alves Lidiane</Apellidos>
+    <Nombre>Alencar</Nombre>
+  </Empleados>
+  <Empleados xmlns="" id="15">
+    <NIF>1673150S</NIF>
+    <Apellidos>Baglione Baglione</Apellidos>
+    <Nombre>Vittorio</Nombre>
+  </Empleados>
+  <Empleados xmlns="" id="22">
+    <NIF>10806930N</NIF>
+    <Apellidos>Boughaza Boughaza</Apellidos>
+    <Nombre>Latifa Epfouad Erre</Nombre>
+  </Empleados>
+  <Empleados xmlns="" id="66">
+    <NIF>9548827D</NIF>
+    <Apellidos>Gracia Puerto</Apellidos>
+    <Nombre>Luisa</Nombre>
+  </Empleados>
+  <Empleados xmlns="" id="71">
+    <NIF>24304263W</NIF>
+    <Apellidos>Llamazares Ramos</Apellidos>
+    <Nombre>Fernando</Nombre>
+  </Empleados>
+  <Empleados xmlns="" id="74">
+    <NIF>1234567L</NIF>
+    <Apellidos>Martinez Fernandez</Apellidos>
+    <Nombre>Juan</Nombre>
+  </Empleados>
+  <Empleados xmlns="" id="78">
+    <NIF />
+    <Apellidos>Molina Vara</Apellidos>
+    <Nombre>Pilar</Nombre>
+  </Empleados>
+  <Empleados xmlns="" id="83">
+    <NIF />
+    <Apellidos>Orejas Díez</Apellidos>
+    <Nombre>Paulina</Nombre>
+  </Empleados>
+</Empleados>

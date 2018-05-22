@@ -19,10 +19,8 @@ public class Trabajador {
     private String apellido1;
     private String apellido2;
     private String DNI;
-    private String categoria;
     private String cuenta;
     private float salario;
-    private float complementos;
     private float antiguedad;
     private float prorrateo;
     private float descuentos;
@@ -31,18 +29,17 @@ public class Trabajador {
     private float formacion;
     private float irpf;
     private float pagos;
-    private float brutoAnual;
     private float retencion;
     private float pagosEmpresario;
     private float porcIRPF;
     private Date fechaAltaEmpresa;
-    private String codCotizacion;
     private boolean prorrata;
     private String pais;
     private String correo;
     private String iban;
     private int id;
     private Empresa empresa;
+    private Categoria categoria;
     
     
     
@@ -122,11 +119,11 @@ public class Trabajador {
         this.retencion=retencion;
     }
 
-    public String getCategoria() {
+    public Categoria getCategoria() {
         return categoria;
     }
 
-    public void setCategoria(String categoria) {
+    public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }
 
@@ -146,15 +143,7 @@ public class Trabajador {
     public void setSalario(float salario) {
         this.salario = salario;
     }
-    
-    public float getComplementos(){
-        return complementos;
-    }
-    
-    public void setComplementos(float complementos){
-        this.complementos=complementos;
-        
-    }
+   
     
     public float getProrrateo(){
         return prorrateo;
@@ -191,15 +180,6 @@ public class Trabajador {
         
     }
 
-    public String getCodCotizacion() {
-        return codCotizacion;
-    }
-
-    public void setCodCotizacion(String codCotizacion) {
-        this.codCotizacion = codCotizacion;
-    }
-
-
     public boolean isProrrata() {
         return prorrata;
     }
@@ -227,12 +207,7 @@ public class Trabajador {
     public boolean hasProrrateo(){
         return this.prorrata;
     }
-    public void setBrutoAnual(float brutoAnual) {
-        this.brutoAnual=brutoAnual;
-    }
-    public float getBrutoAnual(){
-        return this.brutoAnual;
-    }
+    
     public float getPagosEmpresario(){
         return this.pagosEmpresario;
     }
@@ -290,7 +265,6 @@ public class Trabajador {
         
         builder.append("IBAN: " + getIban()+ "\n");
         builder.append("Categoria: " + getCategoria()+ "\n");
-        builder.append("Bruto Anual: " + getBrutoAnual()+ "\n");
         builder.append("Fecha Alta: " + getFechaAltaEmpresa()+ "\n");
         builder.append("----------------------------------\n");
         

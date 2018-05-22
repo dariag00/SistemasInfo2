@@ -58,6 +58,7 @@ public class SI2 {
     private static int nCuMal;
     private static String fecha;
     private static ArrayList<Empresa> listaEmpresas;
+    private static ArrayList<Categoria> listaCategorias;
 
     /**
      * @param args the command line arguments
@@ -180,7 +181,7 @@ public class SI2 {
             Cell cellEmpr= (Cell) list.get(6);
             Cell cuenta = (Cell) list.get(14);
             Cell pais = (Cell) list.get(15);
-            Cell categoria = (Cell) list.get(5);
+            Cell cellCategoria = (Cell) list.get(5);
             Cell prorrata = (Cell) list.get(13);
             Cell fechaAlta = (Cell) list.get(8);
             Cell cellCifEmpr = (Cell) list.get(7);
@@ -199,7 +200,7 @@ public class SI2 {
             }
 
             if((cellApe1.getCellTypeEnum()==CellType.STRING)&&(cellNom.getCellTypeEnum()==CellType.STRING)
-                    &&(cellEmpr.getCellTypeEnum()==CellType.STRING) && (categoria.getCellTypeEnum()==CellType.STRING)
+                    &&(cellEmpr.getCellTypeEnum()==CellType.STRING) && (cellCategoria.getCellTypeEnum()==CellType.STRING)
                     && (prorrata.getCellTypeEnum()==CellType.STRING)){
                 if(cellApe2.getCellTypeEnum()!=CellType.STRING){
                     apellido2="";
@@ -219,13 +220,21 @@ public class SI2 {
                 }
                 trab.setEmpresa(empr);
                 
+                Categoria categoria = new Categoria(cellCategoria.toString(), calculaBrutoAnual(categoria.toString(), sheetData2), 
+                        calculaComplementos(categoria.toString(), sheetData2));
+                for(Categoria cat : listaCategorias){
+                    if(!cat.getNombreCategoria().equals(categoria)){
+                        listaCategorias.add(categoria);
+                    }
+                }
+                trab.setCategoria(categoria);
                 
                 apellido1=cellApe1.toString();
                 trab.setApellido1(apellido1);
                 nombre=cellNom.toString();
                 trab.setNombre(nombre);
                 
-                trab.setCategoria(categoria.toString());
+  
                 String correo=calculaCorreo(nombre, apellido1.toLowerCase(), apellido2.toLowerCase(), nombreEmpresa.toLowerCase());
                 trab.setCorreo(correo);
                 String prort = prorrata.toString();
@@ -238,12 +247,11 @@ public class SI2 {
                 trab.calculateTrienios(fecha);
                 //TODO Aquí empece a poner cosas y crear métodos
                 trab.setSalario(calculaSalario(categoria.toString(), sheetData2));
-                trab.setBrutoAnual(calculaBrutoAnual(categoria.toString(), sheetData2));
-                trab.setComplementos(calculaComplementos(categoria.toString(), sheetData2));
+              
                 trab.setAntiguedad(calculaCompTrienio(trab.getTrienios(), sheetData2));
-                trab.setCodCotizacion(calculaCodCotizacion(categoria.toString(), sheetData2));
                 float prorrat=calcularProrrateo(trab.hasProrrateo(), trab.getSalario(), trab.getComplementos(), trab.getAntiguedad());
                 trab.setProrrateo(prorrat);
+                /*
                 trab.setDescuentos(calcularDescuentos(trab.getBrutoAnual()));
                 trab.setContingencias(calcularContingencias(trab.getBrutoAnual()));
                 trab.setDesempleo(calcularDesempleo(trab.getBrutoAnual()));
@@ -251,7 +259,7 @@ public class SI2 {
                 trab.setPorcIRPF(calcularRetencion(trab.getBrutoAnual(),sheetData2));
                 trab.setFormacion(calcularFormacion(trab.getBrutoAnual()));
                 trab.setPagosEmpresario(calcularPagosEmpresario(trab.getBrutoAnual()));
-                
+                */
                 listaTrabajadores.add(trab);
 
                 write(i, 4, correo);
@@ -656,13 +664,13 @@ public class SI2 {
         return 0;
     }
 
-    private static float calculaComplementos(String categoria, List sheetData2) {
+    private static double calculaComplementos(String categoria, List sheetData2) {
         for(int i = 1; i< sheetData2.size(); i++){
             List list = (List) sheetData2.get(i);
             Cell salarCell = (Cell) list.get(2);
             Cell categCell = (Cell) list.get(0);
             if(categoria.equals(categCell.toString())){
-                return parseFloat(salarCell.toString())/14;
+                return (double) parseFloat(salarCell.toString())/14;
             }
         }
         return 0;
@@ -720,28 +728,16 @@ public class SI2 {
         return descuentoTotal;
     }
 
-    private static float calculaBrutoAnual(String categoria, List sheetData2) {
+    private static double calculaBrutoAnual(String categoria, List sheetData2) {
         for(int i = 1; i< sheetData2.size(); i++){
             List list = (List) sheetData2.get(i);
             Cell salarCell = (Cell) list.get(1);
             Cell categCell = (Cell) list.get(0);
             if(categoria.equals(categCell.toString())){
-                return parseFloat(salarCell.toString());
+                return (double) parseFloat(salarCell.toString());
             }
         }
         return 0;
-    }
-
-    private static String calculaCodCotizacion(String categoria, List sheetData2) {
-        for(int i = 1; i< sheetData2.size(); i++){
-            List list = (List) sheetData2.get(i);
-            Cell salarCell = (Cell) list.get(3);
-            Cell categCell = (Cell) list.get(0);
-            if(categoria.equals(categCell.toString())){
-                return salarCell.toString().substring(0, 1);
-            }
-        }
-        return "Error";
     }
 
     private static float calcularPagosEmpresario(float brutoAnual) {

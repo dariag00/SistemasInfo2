@@ -19,8 +19,6 @@ public class Trabajador {
     private String apellido1;
     private String apellido2;
     private String DNI;
-    private String nombreEmpresa;
-    private String cifEmpresa;
     private String categoria;
     private String cuenta;
     private float salario;
@@ -44,6 +42,7 @@ public class Trabajador {
     private String correo;
     private String iban;
     private int id;
+    private Empresa empresa;
     
     
     
@@ -60,6 +59,15 @@ public class Trabajador {
     public int getId(){
         return id;
     }
+    
+    public Empresa getEmpresa(){
+        return empresa;
+    }
+    
+    public void setEmpresa(Empresa empresa){
+        this.empresa = empresa;
+    }
+    
     public String getCorreo(){
         return correo;
     }
@@ -107,27 +115,11 @@ public class Trabajador {
     public void setDNI(String DNI) {
         this.DNI = DNI;
     }
-
-    public String getNombreEmpresa() {
-        return nombreEmpresa;
-    }
     public float getRetencion(){
         return retencion;
     }
     public void setRetencion(float retencion){
         this.retencion=retencion;
-    }
-
-    public void setNombreEmpresa(String nombreEmpresa) {
-        this.nombreEmpresa = nombreEmpresa;
-    }
-
-    public String getCifEmpresa() {
-        return cifEmpresa;
-    }
-
-    public void setCifEmpresa(String cifEmpresa) {
-        this.cifEmpresa = cifEmpresa;
     }
 
     public String getCategoria() {

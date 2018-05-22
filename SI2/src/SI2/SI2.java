@@ -57,6 +57,7 @@ public class SI2 {
     private static int nCu;
     private static int nCuMal;
     private static String fecha;
+    private static ArrayList<Empresa> listaEmpresas;
 
     /**
      * @param args the command line arguments
@@ -172,7 +173,7 @@ public class SI2 {
             else if(cell.getCellTypeEnum() == CellType.BLANK){ //No hay DNI en el campo
                 addToXML(doc, list, i);//Lo aÃ±adimos al XML
             }
-            String nombre, apellido1, apellido2, nombreEmpresa;
+            String nombre, apellido1, apellido2, nombreEmpresa, cifEmpresa;
             Cell cellApe1= (Cell) list.get(1);
             Cell cellApe2= (Cell) list.get(2);
             Cell cellNom= (Cell) list.get(3);
@@ -182,6 +183,7 @@ public class SI2 {
             Cell categoria = (Cell) list.get(5);
             Cell prorrata = (Cell) list.get(13);
             Cell fechaAlta = (Cell) list.get(8);
+            Cell cellCifEmpr = (Cell) list.get(7);
             
             
             if(cuenta.getCellTypeEnum()==CellType.STRING && pais.getCellTypeEnum()==CellType.STRING){
@@ -205,12 +207,24 @@ public class SI2 {
                 else{
                     apellido2=cellApe2.toString();
                 }
+                                
+                nombreEmpresa=cellEmpr.toString();
+                cifEmpresa = cellCifEmpr.toString();
+                Empresa empr = new Empresa(nombreEmpresa, cifEmpresa);
+                //TODO añadir direccion
+                for(Empresa empresa:listaEmpresas){
+                    if(!empresa.getNombre().equals(nombreEmpresa)){
+                        listaEmpresas.add(new Empresa(nombreEmpresa, cifEmpresa));
+                    }
+                }
+                trab.setEmpresa(empr);
+                
+                
                 apellido1=cellApe1.toString();
                 trab.setApellido1(apellido1);
                 nombre=cellNom.toString();
                 trab.setNombre(nombre);
-                nombreEmpresa=cellEmpr.toString();
-                trab.setNombreEmpresa(nombreEmpresa);
+                
                 trab.setCategoria(categoria.toString());
                 String correo=calculaCorreo(nombre, apellido1.toLowerCase(), apellido2.toLowerCase(), nombreEmpresa.toLowerCase());
                 trab.setCorreo(correo);

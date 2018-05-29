@@ -15,7 +15,9 @@ public class Categoria {
     String nombreCategoria;
     double salarioBase;
     double complemento;
-    
+    int idCategoria;
+
+  
 
     public Categoria() {
         //
@@ -50,5 +52,11 @@ public class Categoria {
     public void setComplemento(double complemento) {
         this.complemento = complemento;
     }
-    
+      public int getIdCategoria() {
+        return idCategoria;
+    }
+
+    public void setIdCategoria(int idCategoria) {
+        this.idCategoria = idCategoria;
+    }
 }

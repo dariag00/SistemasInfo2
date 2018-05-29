@@ -42,7 +42,7 @@ public class Trabajador {
     private String pais;
     private String correo;
     private String iban;
-    private int id;
+    private int idTrabajador;
     private Empresa empresa;
     private Categoria categoria;
     private int trienios;
@@ -59,11 +59,11 @@ public class Trabajador {
     }
     
     public void setId(int id){
-        this.id = id;
+        this.idTrabajador = id;
     }
     
     public int getId(){
-        return id;
+        return idTrabajador;
     }
     
     public Empresa getEmpresa(){

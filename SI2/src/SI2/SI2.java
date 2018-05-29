@@ -193,7 +193,7 @@ public class SI2 {
             
             if(cuenta.getCellTypeEnum()==CellType.STRING && pais.getCellTypeEnum()==CellType.STRING){
                 //Comprobacion de cuenta
-                String cuentaRecalculada=compruebaCuenta(cuenta.toString(),list,i, pais.toString());
+                String cuentaRecalculada=compruebaCuenta(cuenta.toString(),list,i, pais.toString(), trab);
                 trab.setPais(pais.toString());
                 trab.setCuenta(cuentaRecalculada);
                 write(i,14,cuentaRecalculada);
@@ -370,7 +370,7 @@ public class SI2 {
   
     
     
-    private static String compruebaCuenta(String numeroCuenta, List list, int fila, String pais){
+    private static String compruebaCuenta(String numeroCuenta, List list, int fila, String pais, Trabajador trab){
         nCu++;
         
         String cuentaOriginal = numeroCuenta;
@@ -446,7 +446,7 @@ public class SI2 {
             String cuentaCorregida=entidad+oficina+String.valueOf(digito1Recalculado)+String.valueOf(digito2Recalculado)+cuenta;
             nCuMal++;
             //Escribe el XML
-            addToXMLCuentas(doc2, list, fila, calculateIBAN(cuentaCorregida, pais), cuentaOriginal);
+            addToXMLCuentas(doc2, list, fila, trab.calculateIBAN(cuentaCorregida, pais), cuentaOriginal);
             return cuentaCorregida;
         }
         else{ //Si estÃ¡ bien, devuelve la original

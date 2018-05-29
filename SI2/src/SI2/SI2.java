@@ -66,6 +66,7 @@ public class SI2 {
     public static void main(String[] args) throws IOException, ParseException, DocumentException {
         
         System.out.println("Introduce mes y año: (MM/AAAA)");
+        
         Scanner scan = new Scanner(System.in);
         fecha = scan.next();
         

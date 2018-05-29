@@ -15,8 +15,10 @@ public class Categoria {
     String nombreCategoria;
     double salarioBase;
     double complemento;
+    
 
     public Categoria() {
+        //
     }
 
     public Categoria(String nombreCategoria, double salarioBase, double complemento) {

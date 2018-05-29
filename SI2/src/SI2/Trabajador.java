@@ -14,6 +14,7 @@ import java.util.Date;
  * @author Mark
  */
 
+
 public class Trabajador {
     private String nombre;
     private String apellido1;

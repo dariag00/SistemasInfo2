@@ -128,6 +128,9 @@ public class SI2 {
             System.err.println("Capturada excepcion!");
         }
         
+        
+        
+        
         createPdf("pruebaProrrata.pdf", listaTrabajadores.get(2));
         createPdf("pruebaSinProra.pdf", listaTrabajadores.get(6));
         //TODO PEDIR POR CONSOLA EL AÃ‘O Y MES DEL QUE SE DESEAN GENERAR LAS NÃ“MINAS
@@ -140,7 +143,7 @@ public class SI2 {
         // Si entramos el 1 de febrero, generamos 
         
         
-        
+        calcularNominas(fecha, doc2, listaTrabajadores);
         
         
         
@@ -498,6 +501,10 @@ public class SI2 {
         } 
     }
 
+    
+    
+    
+    
     private static float calculaSalario(String categoria, List sheetData2) {
         for(int i = 1; i< sheetData2.size(); i++){
             List list = (List) sheetData2.get(i);
@@ -817,6 +824,16 @@ public class SI2 {
         table.addCell(String.valueOf(devengos*23.60/100+devengos*6.7/100+devengos*0.6/100+devengos/100+devengos*2/100+devengos));
         
         return table;
+    }
+
+    private static void calcularNominas(String fecha, Document doc2, ArrayList<Trabajador> listaTrabajadores) {
+        
+        Nomina nomi= new Nomina();
+        nomi.set
+        
+        
+        
+        //TODO ON MY WAY
     }
 
     

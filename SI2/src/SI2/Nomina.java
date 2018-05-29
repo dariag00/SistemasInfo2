@@ -42,10 +42,7 @@ public class Nomina {
 
     
 
-    @Override
-    public String toString() {
-        
-    }
+  
     
     
     

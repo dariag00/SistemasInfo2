@@ -50,9 +50,9 @@ public class SI2 {
     private static XSSFWorkbook workbook;
     private static String nombreArchivo;
     private static XSSFSheet sheet;
+    //
     private static XSSFSheet sheet2;
     
-    private static ArrayList<String> correos; 
     private static ArrayList<Trabajador> listaTrabajadores;
     private static int nCu;
     private static int nCuMal;
@@ -83,7 +83,7 @@ public class SI2 {
         doc.setRootElement(new Element("Empleados",  Namespace.getNamespace("https://www.journaldev.com/employees")));
         doc2 = new Document();
         doc2.setRootElement(new Element("Cuentas",  Namespace.getNamespace("https://www.journaldev.com/employees")));
-        correos=new ArrayList<>();
+       
         try (FileInputStream file = new FileInputStream(new File(nombreArchivo))){
             workbook = new XSSFWorkbook(file);
             workbook.setMissingCellPolicy(Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
@@ -195,7 +195,7 @@ public class SI2 {
                 trab.setCuenta(cuentaRecalculada);
                 write(i,14,cuentaRecalculada);
                 //Calculo de iban
-                String ibanCalculado=calculateIBAN(cuentaRecalculada, pais.toString());
+                String ibanCalculado=trab.calculateIBAN(cuentaRecalculada, pais.toString());
                 trab.setIban(ibanCalculado);
                 write(i,16,ibanCalculado);
             }
@@ -221,8 +221,8 @@ public class SI2 {
                 }
                 trab.setEmpresa(empr);
                 
-                Categoria categoria = new Categoria(cellCategoria.toString(), calculaBrutoAnual(categoria.toString(), sheetData2), 
-                        calculaComplementos(categoria.toString(), sheetData2));
+                Categoria categoria = new Categoria(cellCategoria.toString(), calculaBrutoAnual(cellCategoria.toString(), sheetData2), 
+                        calculaComplementos(cellCategoria.toString(), sheetData2));
                 for(Categoria cat : listaCategorias){
                     if(!cat.getNombreCategoria().equals(categoria)){
                         listaCategorias.add(categoria);
@@ -236,7 +236,7 @@ public class SI2 {
                 trab.setNombre(nombre);
                 
   
-                String correo=calculaCorreo(nombre, apellido1.toLowerCase(), apellido2.toLowerCase(), nombreEmpresa.toLowerCase());
+                String correo=trab.calculaCorreo(nombre, apellido1.toLowerCase(), apellido2.toLowerCase(), nombreEmpresa.toLowerCase());
                 trab.setCorreo(correo);
                 String prort = prorrata.toString();
                 if(prort.equals("NO")){
@@ -365,29 +365,7 @@ public class SI2 {
        
    }
   
-    private static String calculaCorreo(String nombre, String apellido1, String apellido2, String nombreEmpresa){
-        String correo=nombre.substring(0,3)+apellido1.substring(0,2);
-        if(apellido2!=""){
-            correo=correo+apellido2.substring(0,2);
-        }
-        int i=0;
-        for(String s: correos){
-            if (s.equals(correo)){
-                i++;
-            }
-        }
-        correos.add(correo);
-        if(i<10){
-            correo=correo+0+i;
-        }
-        else{
-            correo=correo+i;
-        }
-        
-        return correo+"@"+nombreEmpresa+".es";
-        
-
-    }
+    
     
     private static String compruebaCuenta(String numeroCuenta, List list, int fila, String pais){
         nCu++;
@@ -474,139 +452,6 @@ public class SI2 {
         }
         
        
-    }
-    
-    private static String calculateIBAN(String numeroCuenta, String pais){
-        int num1 = calculateCountryNum(pais.charAt(0));
-        int num2 = calculateCountryNum(pais.charAt(1));
-        String aux = numeroCuenta;
-        numeroCuenta = numeroCuenta + String.valueOf(num1) + String.valueOf(num2) + "0" + "0";
-        double numTotal = Double.parseDouble(numeroCuenta);
-        int fff =(int) numTotal;
-        int division97 =fff%97;
-        String iban = pais;
-        if(division97 < 10){
-            iban = iban + "0";
-        }
-        
-        iban = iban + division97;
-        return iban + aux;
-    }
-    
-    private static int calculateCountryNum(char letra){
-        
-        int num;
-        switch(letra){
-            case 'A':
-                    num = 10;
-                    break;
-         
-            case 'B':
-                    num = 11;
-                    break;
-            
-            case 'C':
-                    num = 12;
-                    break;
-          
-            case 'D':
-                    num = 13;
-                    break;
-           
-            case 'E':
-                    num = 14;
-                    break;
-           
-            case 'F':
-                    num = 15;
-                    break;
-       
-            case 'G':
-                    num = 16;
-                    break;
-         
-            case 'H':
-                    num = 17;
-                    break;
-         
-            case 'I':
-                    num = 18;
-                    break;
-     
-            case 'J':
-                    num = 19;
-                    break;
-          
-            case 'K':
-                    num = 20;
-                    break;
-        
-            case 'L':
-                    num = 21;
-                    break;
-          
-            case 'M':
-                    num = 22;
-                    break;
-         
-            case 'N':
-                    num = 23;
-                    break;
-          
-            case 'O':
-                    num = 24;
-                    break;
-         
-            case 'P':
-                    num = 25;
-                    break;
-        
-            case 'Q':
-                    num = 26;
-                    break;
-     
-            case 'R':
-                    num = 27;
-                    break;
-           
-            case 'S':
-                    num = 28;
-                    break;
-     
-            case 'T':
-                    num = 29;
-                    break;
-            
-            case 'U':
-                    num = 30;
-                    break;
-          
-            case 'V':
-                    num = 31;
-                    break;
-           
-            case 'W':
-                    num = 32;
-                    break;
-        
-            case 'X':
-                    num = 33;
-                    break;
-         
-            case 'Y':
-                    num = 34;
-                    break;
-     
-            case 'Z':
-                    num = 35;
-                    break;
-                    
-            default:
-                    num = -1;
-     
-        }
-        
-        return num;
     }
     
     
@@ -815,7 +660,7 @@ public class SI2 {
         table.addCell("");
         
         
-        table.addCell("Complento");
+        table.addCell("Complemento");
         table.addCell("30 dias");
         table.addCell(String.valueOf(trabajador.getComplementos()/30));
         table.addCell(String.valueOf(trabajador.getComplementos()));

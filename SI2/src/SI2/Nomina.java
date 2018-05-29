@@ -35,15 +35,16 @@ public class Nomina {
     //FALTAN 2
 
     
-    public Empresa(){
+    public Nomina(){
         
     }
+    
 
     
 
     @Override
     public String toString() {
-        return "Empresa{" + "direccion=" + direccion + ", CIF=" + CIF + ", nombre=" + nombre + '}';
+        
     }
     
     

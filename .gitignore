@@ -1,0 +1,17 @@
+/JavaApplication8/nbproject/private/
+/SI2/SistemasInformacion2/nbproject/private/
+SI2/lib/poi-ooxml-3.17.jar
+*.jar
+*.html
+SI2/lib/poi-3.17/docs/apidocs/package-list
+*.gif
+*.css
+*.rss
+*.xml
+*.png
+*.jpg
+*.ico
+SI2/lib/poi-3.17/LICENSE
+SI2/lib/poi-3.17/NOTICE
+*.properties
+SI2/SistemasInformacionII.xlsx

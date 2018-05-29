@@ -1,0 +1,15 @@
+
+SI2/lib/itext5-itextpdf-5.5.12-sources.jar
+*.jar
+*.html
+*.rss
+*.css
+*.gif
+SI2/lib/poi-3.17/docs/apidocs/package-list
+*.png
+*.jpg
+*.ico
+*.properties
+SI2/lib/poi-3.17/NOTICE
+SI2/lib/poi-3.17/LICENSE
+SI2/SistemasInformacionII.xlsx

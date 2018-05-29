@@ -15,8 +15,8 @@ public class Empresa {
     String direccion;
     String CIF;
     String nombre;
-    
-    
+    int idEmpresa;
+   
     
     
     
@@ -54,8 +54,16 @@ public class Empresa {
 
     @Override
     public String toString() {
-        return "Empresa{" + "direccion=" + direccion + ", CIF=" + CIF + ", nombre=" + nombre + '}';
+       return "";
     }
+     public int getIdEmpresa() {
+        return idEmpresa;
+    }
+
+    public void setIdEmpresa(int idEmpresa) {
+        this.idEmpresa = idEmpresa;
+    }
+}
     
     
     

@@ -46,8 +46,11 @@ public class Trabajador {
     private Empresa empresa;
     private Categoria categoria;
     private int trienios;
+
+    private int prueba;
     
     private static ArrayList<String> correos; 
+    
     
     public Trabajador(){
         this.apellido2 = "";

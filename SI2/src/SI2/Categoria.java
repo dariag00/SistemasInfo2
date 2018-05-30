@@ -23,10 +23,11 @@ public class Categoria {
         //
     }
 
-    public Categoria(String nombreCategoria, double salarioBase, double complemento) {
+    public Categoria(int idCategoria, String nombreCategoria, double salarioBase, double complemento) {
         this.nombreCategoria = nombreCategoria;
         this.salarioBase = salarioBase;
         this.complemento = complemento;
+        this.idCategoria= idCategoria;
     }
 
     public String getNombreCategoria() {

@@ -20,35 +20,63 @@ import java.util.ArrayList;
 
 
 public class Trabajador {
+    
+    private int idTrabajador;
     private String nombre;
     private String apellido1;
     private String apellido2;
     private String DNI;
-    private String cuenta;
-    private float salario;
-    private float antiguedad;
-    private float prorrateo;
-    private float descuentos;
-    private float contingencias;
-    private float desempleo;
-    private float formacion;
-    private float irpf;
-    private float pagos;
-    private float retencion;
-    private float pagosEmpresario;
-    private float porcIRPF;
-    private Date fechaAltaEmpresa;
-    private boolean prorrata;
-    private String pais;
     private String correo;
+    private Date fechaAltaEmpresa;
+    private String cuenta;
     private String iban;
-    private int idTrabajador;
-    private Empresa empresa;
-    private Categoria categoria;
-    private int trienios;
-
-    private int prueba;
+    private int idEmpresa;
+    private int idCategoria;
     
+    private boolean prorrateo;
+
+    public boolean isProrrateo() {
+        return prorrateo;
+    }
+
+    public void setProrrateo(boolean prorrateo) {
+        this.prorrateo = prorrateo;
+    }
+
+    public int getnTrienios() {
+        return nTrienios;
+    }
+
+    public void setnTrienios(int nTrienios) {
+        this.nTrienios = nTrienios;
+    }
+    
+    private int nTrienios;
+
+    public int getIdTrabajador() {
+        return idTrabajador;
+    }
+
+    public void setIdTrabajador(int idTrabajador) {
+        this.idTrabajador = idTrabajador;
+    }
+
+    public int getIdCategoria() {
+        return idCategoria;
+    }
+
+    public void setIdCategoria(int idCategoria) {
+        this.idCategoria = idCategoria;
+    }
+
+    public static ArrayList<String> getCorreos() {
+        return correos;
+    }
+
+    public static void setCorreos(ArrayList<String> correos) {
+        Trabajador.correos = correos;
+    }
+
     private static ArrayList<String> correos; 
     
     
@@ -66,12 +94,12 @@ public class Trabajador {
         return idTrabajador;
     }
     
-    public Empresa getEmpresa(){
-        return empresa;
+    public int getIdEmpresa(){
+        return idEmpresa;
     }
     
-    public void setEmpresa(Empresa empresa){
-        this.empresa = empresa;
+    public void setEmpresa(int idEmpresa){
+        this.idEmpresa = idEmpresa;
     }
     
     public String getCorreo(){
@@ -121,21 +149,6 @@ public class Trabajador {
     public void setDNI(String DNI) {
         this.DNI = DNI;
     }
-    public float getRetencion(){
-        return retencion;
-    }
-    public void setRetencion(float retencion){
-        this.retencion=retencion;
-    }
-
-    public Categoria getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(Categoria categoria) {
-        this.categoria = categoria;
-    }
-
 
     public String getCuenta() {
         return cuenta;
@@ -143,40 +156,6 @@ public class Trabajador {
 
     public void setCuenta(String cuenta) {
         this.cuenta = cuenta;
-    }
-
-    public float getSalario() {
-        return salario;
-    }
-
-    public void setSalario(float salario) {
-        this.salario = salario;
-    }
-   
-    
-    public float getProrrateo(){
-        return prorrateo;
-    }
-    
-    public void setProrrateo(float prorrateo){
-        this.prorrateo=prorrateo;
-        
-    }
-    public float getDescuentos(){
-        return descuentos;
-    }
-    
-    public void setDescuentos(float descuentos){
-        this.descuentos=descuentos;
-        
-    }
-    public float getPagos(){
-        return pagos;
-    }
-    
-    public void setPagos(float pagos){
-        this.pagos=pagos;
-        
     }
 
     public Date getFechaAltaEmpresa() {
@@ -189,70 +168,6 @@ public class Trabajador {
         
     }
 
-    public boolean isProrrata() {
-        return prorrata;
-    }
-
-    public void setProrrata(boolean prorrata) {
-        this.prorrata = prorrata;
-    }
-
-    public String getPais() {
-        return pais;
-    }
-
-    public void setPais(String pais) {
-        this.pais = pais;
-    }
-    public int getTrienios(){
-        return this.trienios;
-    }
-    public void setAntiguedad(float ant){
-        this.antiguedad=ant;
-    }
-    public float getAntiguedad(){
-        return this.antiguedad;
-    }
-    public boolean hasProrrateo(){
-        return this.prorrata;
-    }
-    
-    public float getPagosEmpresario(){
-        return this.pagosEmpresario;
-    }
-    public void setPagosEmpresario(float pagosEmpresario){
-        this.pagosEmpresario=pagosEmpresario;
-    }
-    public void setContingencias(float contingencias){
-        this.contingencias=contingencias;
-    }
-    public void setIRPF(float IRPF){
-        this.irpf=IRPF;
-    }
-    public void setDesempleo(float desempleo){
-        this.desempleo=desempleo;
-    }
-    public void setFormacion(float formacion){
-        this.formacion=formacion;
-    }
-    public float getFormacion(){
-        return formacion;
-    }
-    public float getDesempleo(){
-        return desempleo;
-    }
-    public float getIRPF(){
-        return irpf;
-    }
-    public float getContingencias(){
-        return contingencias;
-    }
-    public float getPorcIRPF(){
-        return porcIRPF;
-    }
-    public void setPorcIRPF(float porcIRPF){
-        this.porcIRPF=porcIRPF;
-    }
     
     
     public void calculateTrienios(String fecha) throws ParseException{
@@ -263,27 +178,12 @@ public class Trabajador {
         double division =   milliseconds / 94608;
         int trie=(int) Math.floor(division/1000000);
         if(trie<=0)
-            this.trienios=0;
+            this.nTrienios=0;
         else
-            this.trienios=trie;
+            this.nTrienios=trie;
     }   
     
-    public String toString(){
-        StringBuilder builder = new StringBuilder();
-        
-        
-        builder.append("IBAN: " + getIban()+ "\n");
-        builder.append("Categoria: " + getCategoria()+ "\n");
-        builder.append("Fecha Alta: " + getFechaAltaEmpresa()+ "\n");
-        builder.append("----------------------------------\n");
-        
-        builder.append(getDNI()+ "\n");
-        builder.append(getNombre()+ " " + getApellido1() + " " + getApellido2() + "\n");            
-        builder.append("\n");
-        
-        return builder.toString();
-    }
-    
+  
     
     
     

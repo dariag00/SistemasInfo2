@@ -6,18 +6,11 @@
 package SI2;
 
 import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Phrase;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.pdf.draw.DottedLineSeparator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import static java.lang.Float.parseFloat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -59,6 +52,7 @@ public class SI2 {
     private static String fecha;
     private static ArrayList<Empresa> listaEmpresas;
     private static ArrayList<Categoria> listaCategorias;
+    private static ArrayList<Nomina> listaNominas;
 
     /**
      * @param args the command line arguments
@@ -128,21 +122,7 @@ public class SI2 {
             System.err.println("Capturada excepcion!");
         }
         
-        
-        
-        
-        createPdf("pruebaProrrata.pdf", listaTrabajadores.get(2));
-        createPdf("pruebaSinProra.pdf", listaTrabajadores.get(6));
-        //TODO PEDIR POR CONSOLA EL AÃ‘O Y MES DEL QUE SE DESEAN GENERAR LAS NÃ“MINAS
-        // DE ESTA FORMA: mm/aaaa
-        
-        
-        //TODO USAR ITEXT 5 PARA HACER PDF DESDE JAVA(ITEXTPDF)
-        
-        //TODO LAS PAGAS EXTRAS SON "UN MES ANTES DE LO QUE PARECERIA LOGICO"
-        // Si entramos el 1 de febrero, generamos 
-        
-        
+        listaNominas=new ArrayList<>();
         calcularNominas(fecha, sheetData2, listaTrabajadores);
         
         
@@ -153,6 +133,21 @@ public class SI2 {
     
     private static void showData(List sheetData, List sheetData2) throws IOException, ParseException{
         ArrayList<String> listaNifs = new ArrayList<String>();
+        listaCategorias = new ArrayList<>();
+        listaEmpresas = new ArrayList<>();
+        //Creamos la lista de categorias
+        Categoria cat;
+        for(int i=1;i<14;i++){
+            List list = (List) sheetData2.get(i);
+            Cell categCell= (Cell) list.get(0);
+            Cell salarCell = (Cell) list.get(1);
+            Cell compCell = (Cell) list.get(2);
+            cat=new Categoria(i, categCell.toString(), Double.valueOf(salarCell.toString()), Double.valueOf(compCell.toString()));
+            listaCategorias.add(cat);
+        }
+        
+        
+        // lo demás
         for(int i = 1; i< sheetData.size(); i++){
             List list = (List) sheetData.get(i);
             Cell cell = (Cell) list.get(0);      
@@ -161,7 +156,7 @@ public class SI2 {
             trab.setId(i);
             
             if(cell.getCellTypeEnum() == CellType.STRING){ //El DNI tiene una letra al final
-                String analizedNif = analisamosNif(cell.toString());
+                String analizedNif = analizamosNif(cell.toString());
                 trab.setDNI(analizedNif);
 
                 if(!analizedNif.equals(cell.toString())){ //El DNI tiene la letra que no es
@@ -194,7 +189,6 @@ public class SI2 {
             if(cuenta.getCellTypeEnum()==CellType.STRING && pais.getCellTypeEnum()==CellType.STRING){
                 //Comprobacion de cuenta
                 String cuentaRecalculada=compruebaCuenta(cuenta.toString(),list,i, pais.toString(), trab);
-                trab.setPais(pais.toString());
                 trab.setCuenta(cuentaRecalculada);
                 write(i,14,cuentaRecalculada);
                 //Calculo de iban
@@ -212,59 +206,41 @@ public class SI2 {
                 else{
                     apellido2=cellApe2.toString();
                 }
-                                
+                //Creamos la empresa y la añadimos si no está              
                 nombreEmpresa=cellEmpr.toString();
                 cifEmpresa = cellCifEmpr.toString();
                 Empresa empr = new Empresa(nombreEmpresa, cifEmpresa);
                 //TODO añadir direccion
+                
                 for(Empresa empresa:listaEmpresas){
                     if(!empresa.getNombre().equals(nombreEmpresa)){
                         listaEmpresas.add(new Empresa(nombreEmpresa, cifEmpresa));
                     }
                 }
-                trab.setEmpresa(empr);
+                trab.setEmpresa(empr.getIdEmpresa());
                 
-                Categoria categoria = new Categoria(cellCategoria.toString(), calculaBrutoAnual(cellCategoria.toString(), sheetData2), 
-                        calculaComplementos(cellCategoria.toString(), sheetData2));
-                for(Categoria cat : listaCategorias){
-                    if(!cat.getNombreCategoria().equals(categoria)){
-                        listaCategorias.add(categoria);
-                    }
+                for(Categoria cate : listaCategorias){
+                    if(cate.nombreCategoria.equals(cellCategoria.toString()))
+                        trab.setIdCategoria(cate.idCategoria);
                 }
-                trab.setCategoria(categoria);
                 
                 apellido1=cellApe1.toString();
                 trab.setApellido1(apellido1);
                 nombre=cellNom.toString();
                 trab.setNombre(nombre);
                 
-  
                 String correo=trab.calculaCorreo(nombre, apellido1.toLowerCase(), apellido2.toLowerCase(), nombreEmpresa.toLowerCase());
                 trab.setCorreo(correo);
                 String prort = prorrata.toString();
                 if(prort.equals("NO")){
-                    trab.setProrrateo(0);
+                    trab.setProrrateo(false);
                 }else{
-                    trab.setProrrata(true);
-                    float prorrat=calcularProrrateo(trab.hasProrrateo(), trab.getSalario(), trab.getComplementos(), trab.getAntiguedad());
-                    trab.setProrrateo(prorrat);
+                    trab.setProrrateo(true);
                 }
                 trab.setFechaAltaEmpresa(fechaAlta.getDateCellValue());
                 trab.calculateTrienios(fecha);
-                //TODO Aquí empece a poner cosas y crear métodos
-                trab.setSalario(calculaSalario(categoria.toString(), sheetData2));
-              
-                trab.setAntiguedad(calculaCompTrienio(trab.getTrienios(), sheetData2));
                 
-                /*
-                trab.setDescuentos(calcularDescuentos(trab.getBrutoAnual()));
-                trab.setContingencias(calcularContingencias(trab.getBrutoAnual()));
-                trab.setDesempleo(calcularDesempleo(trab.getBrutoAnual()));
-                trab.setIRPF(calcularIRPF(trab.getBrutoAnual()));
-                trab.setPorcIRPF(calcularRetencion(trab.getBrutoAnual(),sheetData2));
-                trab.setFormacion(calcularFormacion(trab.getBrutoAnual()));
-                trab.setPagosEmpresario(calcularPagosEmpresario(trab.getBrutoAnual()));
-                */
+                
                 listaTrabajadores.add(trab);
 
                 write(i, 4, correo);
@@ -275,7 +251,7 @@ public class SI2 {
     }
     //FunciÃ³n que comprueba que el nif estÃ© bien
    
-    private static String analisamosNif(String nif){
+    private static String analizamosNif(String nif){
         char letraFinal = 'x';
         if(!Character.isDigit(nif.charAt(0))){
             if(nif.charAt(0) == 'X'){
@@ -502,291 +478,22 @@ public class SI2 {
 
     
     
-    
-   S
-    
-    private static float calculaCompTrienio(int trienios, List sheetData2) {
-        if(trienios<=0)
-            return 0;
-        if(trienios==1) //TODO: BUG: no se por que, con 1 trienio pone el maximo importe... de momento lo hardcodeamos así
-            return 15;
-        float compT=0;
-        for(int i = 18; i< 36; i++){
-            List list = (List) sheetData2.get(i);
-            Cell trieCell = (Cell) list.get(3);
-            Cell pagoCell = (Cell) list.get(4);
-            if(Integer.parseInt(trieCell.toString().substring(0,1))==trienios){
-                compT=(float) pagoCell.getNumericCellValue();
-            }
-        }
-        return compT;
-    }
-    private static float calcularProrrateo(boolean prorrata, float salario, float complemento, float antiguedad) {
-        if(!prorrata)         
-            return 0;
-        return (salario)/6+(complemento)/6+(antiguedad)/6;
-    }
-    
-    private static float calcularDescuentos(float brutoAnual) {
-        float descuentoTotal=0;
-        //IRPF 12.08%
-        descuentoTotal+=(brutoAnual/12)*(12.08)/100;
-        //Seguridad Social 4.7%
-        descuentoTotal+=(brutoAnual/12)*(4.7)/100;
-        //Desempleo 1.6%
-        descuentoTotal+=(brutoAnual/12)*(1.6)/100;
-        //Formacion 0.1
-        descuentoTotal+=(brutoAnual/12)*(0.1)/100;
-        
-        return descuentoTotal;
-    }
 
     
-
-    private static float calcularPagosEmpresario(float brutoAnual) {
-        float total=0;
-        //Salario bruto anual
-        total+=brutoAnual;
-        //Seguridad Social 4.7%
-        total+=(brutoAnual/12)*(4.7)/100;
-        //FOGASA
-        total+=(brutoAnual/12)*(0.2)/100;
-        //Desempleo 1.6%
-        total+=(brutoAnual/12)*(1.6)/100;
-        //Formacion 0.1
-        total+=(brutoAnual/12)*(0.1)/100;
-        
-        
-        return total;
-    }
-
-    private static float calcularContingencias(float brutoAnual) {
-        return (float) ((brutoAnual/12)*(4.7)/100);
-    }
-
-    private static float calcularIRPF(float brutoAnual) {
-        return (float) ((brutoAnual/12)*(12.08)/100);
-    }
-
-    private static float calcularFormacion(float brutoAnual) {
-        return (float) ((brutoAnual/12)*(0.1)/100);
-        
-       
-    }
-    private static float calcularDesempleo(float brutoAnual) {
-        return (float) ((brutoAnual/12)*(1.6)/100);
-        
-    }
-    
-    public static PdfPTable createFirstTable(Trabajador trabajador) {
-    	// a table with three columns
-        PdfPTable table = new PdfPTable(5);
-        // the cell object
-        PdfPCell cell;
-        // we add a cell with colspan 3
-        cell = new PdfPCell(new Phrase("Nomina de " + fecha));
-        cell.setColspan(5);
-        table.addCell(cell);
-        // now we add a cell with rowspan 2
-        cell = new PdfPCell(new Phrase(""));
-        table.addCell(cell);
-        // we add the four remaining cells with addCell()
-        table.addCell("cant");
-        table.addCell("Imp. Unit");
-        table.addCell("Dev.");
-        table.addCell("Deduc.");
-        
-        table.addCell("Salario Base");
-        table.addCell("30 dias");
-        table.addCell(String.valueOf(trabajador.getSalario()/30));
-        table.addCell(String.valueOf(trabajador.getSalario()));
-        table.addCell("");
-        
-        
-        
-        table.addCell("Prorrata");
-        table.addCell("30 dias");
-        if(trabajador.hasProrrateo()){
-            table.addCell(String.valueOf(trabajador.getProrrateo()/30));
-            table.addCell(String.valueOf(trabajador.getProrrateo()));
-        }
-        else{
-            table.addCell(" ");
-            table.addCell(" ");
-        }
-        table.addCell("");
-        
-        
-        table.addCell("Complemento");
-        table.addCell("30 dias");
-        table.addCell(String.valueOf(trabajador.getComplementos()/30));
-        table.addCell(String.valueOf(trabajador.getComplementos()));
-        table.addCell("");
-        
-        
-        table.addCell("Antiguedad");
-        table.addCell(String.valueOf(trabajador.getTrienios()) + " trienios.");
-        table.addCell(String.valueOf(trabajador.getAntiguedad()/30));
-        table.addCell(String.valueOf(trabajador.getAntiguedad()));
-        table.addCell("");
-        float devengoTotal;
-        if(trabajador.hasProrrateo()){
-            devengoTotal=trabajador.getAntiguedad()+trabajador.getComplementos()+trabajador.getProrrateo()+trabajador.getSalario();
-        }
-        else{
-            devengoTotal=trabajador.getAntiguedad()+trabajador.getComplementos()+trabajador.getSalario();
-        }
-        
-        cell = new PdfPCell(new Phrase(" "));
-        cell.setColspan(5);
-        table.addCell(cell);
-        
-        table.addCell("Contingencias Generales");
-        table.addCell("4.7%");
-        table.addCell("de "+devengoTotal);
-        table.addCell("");
-        table.addCell(String.valueOf(trabajador.getContingencias()));
-        
-        table.addCell("Desempleo");
-        table.addCell("1.6%");
-        table.addCell("de "+devengoTotal);;
-        table.addCell("");
-        table.addCell(String.valueOf(trabajador.getDesempleo()));
-        
-        table.addCell("Cuota formación");
-        table.addCell("0.1%");
-        table.addCell("de "+devengoTotal);;
-        table.addCell("");
-        table.addCell(String.valueOf(trabajador.getFormacion()));
-        
-        table.addCell("IRPF");
-        table.addCell(String.valueOf(trabajador.getPorcIRPF()));
-        table.addCell("de "+devengoTotal);;
-        table.addCell("");
-        float descuentoTotal=(devengoTotal*(trabajador.getPorcIRPF()/100))+trabajador.getFormacion()+trabajador.getDesempleo()+trabajador.getContingencias();
-        table.addCell(String.valueOf(devengoTotal*(trabajador.getPorcIRPF()/100)));
-        
-        cell = new PdfPCell(new Phrase(" "));
-        cell.setColspan(5);
-        table.addCell(cell);
-        
-        cell = new PdfPCell(new Phrase("Total Deducciones"));
-        cell.setColspan(4);
-        table.addCell(cell);
-        table.addCell(String.valueOf(trabajador.getDescuentos()));
-        
-        cell = new PdfPCell(new Phrase("Total Dev"));
-        cell.setColspan(3);
-        table.addCell(cell);
-        cell = new PdfPCell(new Phrase(String.valueOf(trabajador.getSalario() + trabajador.getProrrateo()+trabajador.getAntiguedad()+trabajador.getComplementos())));
-        cell.setColspan(2);
-        table.addCell(cell);
-        
-        cell = new PdfPCell(new Phrase("Líquido a Percibir"));
-        cell.setColspan(4);
-        table.addCell(cell); 
-        table.addCell(String.valueOf(devengoTotal-descuentoTotal));
-
-        return table;
-    }
-    
-    public static void createPdf(String filename, Trabajador employee)
-        throws IOException, DocumentException {
-        
-        
-        
-        
-    	// step 1
-        com.itextpdf.text.Document document = new com.itextpdf.text.Document();
-        // step 2
-        PdfWriter.getInstance(document, new FileOutputStream(filename));
-        // step 3
-        document.open();
-        Paragraph infoEmpresa = new Paragraph("info empresa\n");
-        Paragraph infoEmpleado = new Paragraph(employee.toString());
-        document.add(infoEmpresa);
-        document.add(infoEmpleado);
-        // step 410/
-        document.add(createFirstTable(employee));
-        document.add(createSecondTable(employee));
-        // step 5
-        document.close();
-    }
-
-    private static com.itextpdf.text.Element createSecondTable(Trabajador trabajador) {
-        // a table with three columns
-        PdfPTable table = new PdfPTable(5);
-        // the cell object
-        PdfPCell cell;
-        // we add a cell with colspan 3
-        cell = new PdfPCell(new Phrase("Cálculo de coste para el empresario"));
-        cell.setColspan(5);
-        table.addCell(cell);
-        // now we add a cell with rowspan 2
-        cell = new PdfPCell(new Phrase(""));
-        table.addCell("Calculo base");
-        // we add the four remaining cells with addCell()
-        table.addCell("");
-        table.addCell("");
-        table.addCell("");
-        float devengos;
-        if(trabajador.hasProrrateo()){
-            devengos=trabajador.getAntiguedad()+trabajador.getComplementos()+trabajador.getProrrateo()+trabajador.getSalario();
-        }
-        else{
-            devengos=trabajador.getAntiguedad()+trabajador.getComplementos()+trabajador.getSalario();
-        }
-        table.addCell(String.valueOf(devengos));
-        
-        cell = new PdfPCell(new Phrase("Contingencias comunes 23.60%"));
-        cell.setColspan(4);
-        table.addCell(cell);
-        table.addCell(String.valueOf(devengos*23.60/100));
-         
-        cell = new PdfPCell(new Phrase("Desempleo 6.7%"));
-        cell.setColspan(4);
-        table.addCell(cell);
-        table.addCell(String.valueOf(devengos*6.7/100)); 
-        
-        cell = new PdfPCell(new Phrase("Formación 0.6%"));
-        cell.setColspan(4);
-        table.addCell(cell);
-        table.addCell(String.valueOf(devengos*0.6/100)); 
-        
-        cell = new PdfPCell(new Phrase("Accidentes de trabajo 1.0%"));
-        cell.setColspan(4);
-        table.addCell(cell);
-        table.addCell(String.valueOf(devengos/100));
-         
-        cell = new PdfPCell(new Phrase("FOGASA 2%"));
-        cell.setColspan(4);
-        table.addCell(cell);
-        table.addCell(String.valueOf(devengos*2/100));
-         
-        cell = new PdfPCell(new Phrase("TOTAL EMPRESARIO"));
-        cell.setColspan(4);
-        table.addCell(cell);
-        table.addCell(String.valueOf(devengos*23.60/100+devengos*6.7/100+devengos*0.6/100+devengos/100+devengos*2/100));
-        
-        cell = new PdfPCell(new Phrase("Coste total del trabajador"));
-        cell.setColspan(4);
-        table.addCell(cell);
-        table.addCell(String.valueOf(devengos*23.60/100+devengos*6.7/100+devengos*0.6/100+devengos/100+devengos*2/100+devengos));
-        
-        return table;
-    }
+   
 
     private static void calcularNominas(String fecha, List sheetData2, ArrayList<Trabajador> listaTrabajadores) {
         
         Nomina nomi;
-        double valorAux; 
+        int count=0;
         for(Trabajador trab : listaTrabajadores){
-            valorAux=0;
+            count++;;
             nomi= new Nomina(); 
             nomi.setIdTrabajador(trab.getId());
-            nomi.setAnio(Integer.getInteger(fecha.substring(3,8)));
-            nomi.setAnio(Integer.getInteger(fecha.substring(3,8)));
-            nomi.setNumeroTrienios(trab.getTrienios());
+            nomi.setIdNomina(count);
+            nomi.setMes(Integer.valueOf(fecha.substring(0,1)));
+            nomi.setAnio(Integer.valueOf(fecha.substring(3,7)));
+            nomi.setNumeroTrienios(trab.getnTrienios());
             
             //Calculamos Trabajador 
             for(int i = 1; i< sheetData2.size(); i++){//IRPF y ValorIRPF
@@ -795,12 +502,21 @@ public class SI2 {
                 Cell salarCell = (Cell) list.get(1);
                 Cell categCell = (Cell) list.get(0);
                 
-                if(trab.getCategoria().equals(categCell.toString())){
+                if((listaCategorias.get(trab.getIdCategoria()).nombreCategoria).equals(categCell.toString())){
                     nomi.setBrutoAnual(Double.parseDouble(salarCell.toString()));
                     nomi.setImporteComplementoMes(Double.parseDouble(complementCell.toString())/14);
                     nomi.setImporteSalarioMes(Double.parseDouble(salarCell.toString())/14);
                 }
                 
+            }
+            //Calculamos la cantidad de los trienios
+            for(int i=18;i<36;i++){
+                List list= (List) sheetData2.get(i);
+                Cell nTriCell=(Cell) list.get(3);
+                Cell cantTriCell=(Cell) list.get(4);
+                if(nomi.getNumeroTrienios()==Double.valueOf(nTriCell.toString())){
+                    nomi.setImporteTrienios(Double.valueOf(cantTriCell.toString()));
+                }
             }
             for(int i=49;i>0;i--){
                 List list = (List) sheetData2.get(i);
@@ -813,15 +529,23 @@ public class SI2 {
                 else{
                     if(!encontrado){
                         nomi.setIRPF(Double.valueOf(IRPFCell.toString()));
+                        encontrado=true;
                     }
                 }
             }
             //Calculamos si lo prorratea o no. 
             
-            nomi.setValorProrrateo(trab.getProrrateo());
+            //SI el trabajador tiene prorrateo...
+            if(trab.isProrrateo()){
+                nomi.setValorProrrateo(nomi.importeSalarioMes/6);
+            }
+            else{
+                nomi.setValorProrrateo(0);
+            }
             nomi.setImporteIRPF(nomi.brutoAnual*nomi.getIRPF()/100);
             
-            //TODO COMPRABAR ESTOS
+            //TODO COMPROBAR ESTOS
+            
             List listCuotaO=(List) sheetData2.get(17);
             List listDesempleoT=(List) sheetData2.get(18);
             List listFormacionT=(List) sheetData2.get(19);
@@ -841,7 +565,6 @@ public class SI2 {
             List listDesempleo=(List) sheetData2.get(22);
             List listFormacion=(List) sheetData2.get(23);
             List listAccidentes=(List) sheetData2.get(24);
-            //TODO Si es extra acordarse de que muchas cosas de aquí valen 0
             nomi.setBaseEmpresario(nomi.getBrutoAnual()/12);
             nomi.setSeguridadSocialEmpresario(Double.parseDouble(listSS.get(1).toString()));
             nomi.setImporteSeguridadSocialEmpresario(nomi.getBaseEmpresario()*nomi.getSeguridadSocialEmpresario()/100);
@@ -856,18 +579,19 @@ public class SI2 {
             
             //FINAL
             
-           //nomi.setBrutoNomina(nomi.setCosteTotalEmpresario(valorAux));
+            nomi.setBrutoNomina(nomi.getImporteSalarioMes()+nomi.getImporteTrienios()+nomi.getImporteComplementoMes()+nomi.getValorProrrateo());
+            nomi.setLiquidoNomina(nomi.getBrutoNomina()-(nomi.getImporteDesempleoTrabajador()+nomi.getImporteFormacionTrabajador()+nomi.getImporteSeguridadSocialTrabajador()+nomi.getImporteIRPF()));
+            nomi.setCosteTotalEmpresario(nomi.getImporteDesempleoEmpresario()+nomi.getImporteFOGASAEmpresario()+nomi.getImporteFormacionEmpresario()+nomi.getImporteSeguridadSocialEmpresario());
             
             
-            
-            
+            listaNominas.add(nomi);
             
             
         }
         
         
         
-        //TODO ON MY WAY
+        
     }
 
     

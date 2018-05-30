@@ -122,10 +122,35 @@ public class SI2 {
             System.err.println("Capturada excepcion!");
         }
         
+        
+        for(Categoria cate : listaCategorias){
+            cate.toString();
+        }
+        
         listaNominas=new ArrayList<>();
         calcularNominas(fecha, sheetData2, listaTrabajadores);
         
         
+        
+        
+        /*
+        System.out.println("---------------Categorias-------------");
+        for(Categoria cate : listaCategorias){
+            System.out.println(cate.toString());
+        }
+         System.out.println("---------------Empresas-------------");
+        for(Empresa emp : listaEmpresas){
+            System.out.println(emp.toString());
+        }
+         System.out.println("---------------Trabajadores-------------");
+        for(Trabajador trab : listaTrabajadores){
+            System.out.println(trab.toString());
+        } 
+        System.out.println("---------------Nominas-------------");
+        for(Nomina nomi : listaNominas){
+            System.out.println(nomi.toString());
+        }
+        */
         
         
         
@@ -139,7 +164,7 @@ public class SI2 {
         listaEmpresas = new ArrayList<>();
         //Creamos la lista de categorias
         Categoria cat;
-        for(int i=1;i<14;i++){
+        for(int i=1;i<15;i++){
             List list = (List) sheetData2.get(i);
             Cell categCell= (Cell) list.get(0);
             Cell salarCell = (Cell) list.get(1);
@@ -222,8 +247,10 @@ public class SI2 {
                 trab.setEmpresa(empr.getIdEmpresa());
                 
                 for(Categoria cate : listaCategorias){
-                    if(cate.nombreCategoria.equals(cellCategoria.toString()))
+                    if(cate.nombreCategoria.equals(cellCategoria.toString())){
                         trab.setIdCategoria(cate.idCategoria);
+                    
+                    }
                 }
                 
                 apellido1=cellApe1.toString();
@@ -493,22 +520,23 @@ public class SI2 {
             nomi= new Nomina(); 
             nomi.setIdTrabajador(trab.getId());
             nomi.setIdNomina(count);
-            nomi.setMes(Integer.valueOf(fecha.substring(0,1)));
+            nomi.setMes(Integer.valueOf(fecha.substring(0,2)));
             nomi.setAnio(Integer.valueOf(fecha.substring(3,7)));
             nomi.setNumeroTrienios(trab.getnTrienios());
             
             //Calculamos Trabajador 
-            for(int i = 1; i< sheetData2.size(); i++){//IRPF y ValorIRPF
+            for(int i = 1; i< sheetData2.size(); i++){
                 List list = (List) sheetData2.get(i);
                 Cell complementCell= (Cell) list.get(2);
                 Cell salarCell = (Cell) list.get(1);
                 Cell categCell = (Cell) list.get(0);
-                
-                if((listaCategorias.get(trab.getIdCategoria()).nombreCategoria).equals(categCell.toString())){
+                if((listaCategorias.get((trab.getIdCategoria())-1).nombreCategoria).equals(categCell.toString())){
                     nomi.setBrutoAnual(Double.parseDouble(salarCell.toString()));
                     nomi.setImporteComplementoMes(Double.parseDouble(complementCell.toString())/14);
                     nomi.setImporteSalarioMes(Double.parseDouble(salarCell.toString())/14);
+                    break;
                 }
+                
                 
             }
             //Calculamos la cantidad de los trienios
@@ -526,13 +554,13 @@ public class SI2 {
                 Cell IRPFCell = (Cell) list.get(6);
                 boolean encontrado=false;
                 if(nomi.getBrutoAnual()>Double.parseDouble(brutoCell.toString())){
-                    
                 }
                 else{
                     if(!encontrado){
                         nomi.setIRPF(Double.valueOf(IRPFCell.toString()));
                         encontrado=true;
                     }
+                   
                 }
             }
             //Calculamos si lo prorratea o no. 

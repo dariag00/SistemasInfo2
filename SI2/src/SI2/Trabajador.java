@@ -22,6 +22,8 @@ import java.util.ArrayList;
 public class Trabajador {
     
     private int idTrabajador;
+
+    
     private String nombre;
     private String apellido1;
     private String apellido2;
@@ -342,7 +344,10 @@ public class Trabajador {
         
 
     }
-    
+    @Override
+    public String toString() {
+        return "Trabajador{" + "idTrabajador=" + idTrabajador + ", nombre=" + nombre + ", apellido1=" + apellido1 + ", apellido2=" + apellido2 + ", DNI=" + DNI + ", correo=" + correo + ", fechaAltaEmpresa=" + fechaAltaEmpresa + ", cuenta=" + cuenta + ", iban=" + iban + ", idEmpresa=" + idEmpresa + ", idCategoria=" + idCategoria + ", prorrateo=" + prorrateo + ", nTrienios=" + nTrienios + '}';
+    }
 }
 
 

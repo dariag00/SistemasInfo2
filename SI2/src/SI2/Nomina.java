@@ -308,6 +308,7 @@ public class Nomina {
     public Nomina(){
         
     }
+    //TODO Descomentar esto
     /*
      public static void createPdf(String filename, Trabajador employee)
         throws IOException, DocumentException {
@@ -511,6 +512,11 @@ public class Nomina {
         return table;
     }
     */
+
+    @Override
+    public String toString() {
+        return "Nomina{" + "mes=" + mes + ", anio=" + anio + ", numeroTrienios=" + numeroTrienios + ", importeTrienios=" + importeTrienios + ", importeSalarioMes=" + importeSalarioMes + ", importeComplementoMes=" + importeComplementoMes + ", valorProrrateo=" + valorProrrateo + ", brutoAnual=" + brutoAnual + ", IRPF=" + IRPF + ", importeIRPF=" + importeIRPF + ", baseEmpresario=" + baseEmpresario + ", seguridadSocialEmpresario=" + seguridadSocialEmpresario + ", importeSeguridadSocialEmpresario=" + importeSeguridadSocialEmpresario + ", desempleoEmpresario=" + desempleoEmpresario + ", importeDesempleoEmpresario=" + importeDesempleoEmpresario + ", formacionEmpresario=" + formacionEmpresario + ", importeFormacionEmpresario=" + importeFormacionEmpresario + ", accidentesTrabajoEmpresario=" + accidentesTrabajoEmpresario + ", importeAccidentesTrabajo=" + importeAccidentesTrabajo + ", FOGASAEmpresario=" + FOGASAEmpresario + ", importeFOGASAEmpresario=" + importeFOGASAEmpresario + ", seguridadSocialTrabajador=" + seguridadSocialTrabajador + ", importeSeguridadSocialTrabajador=" + importeSeguridadSocialTrabajador + ", desempleoTrabajador=" + desempleoTrabajador + ", importeDesempleoTrabajador=" + importeDesempleoTrabajador + ", formacionTrabajador=" + formacionTrabajador + ", importeFormacionTrabajador=" + importeFormacionTrabajador + ", brutoNomina=" + brutoNomina + ", liquidoNomina=" + liquidoNomina + ", costeTotalEmpresario=" + costeTotalEmpresario + ", idTrabajador=" + idTrabajador + ", idNomina=" + idNomina + '}';
+    }
 
     
 

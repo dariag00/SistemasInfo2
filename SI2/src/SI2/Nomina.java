@@ -309,8 +309,7 @@ public class Nomina {
         
     }
     //TODO Descomentar esto
-    /*
-     public static void createPdf(String filename, Trabajador employee)
+     public  void createPdf(String filename, Trabajador employee)
         throws IOException, DocumentException {
         
         
@@ -334,13 +333,13 @@ public class Nomina {
     }
     
      
-    public static PdfPTable createFirstTable(Trabajador trabajador) {
+    public  PdfPTable createFirstTable(Trabajador trabajador) {
     	// a table with three columns
         PdfPTable table = new PdfPTable(5);
         // the cell object
         PdfPCell cell;
         // we add a cell with colspan 3
-        cell = new PdfPCell(new Phrase("Nomina de " + fecha));
+        cell = new PdfPCell(new Phrase("Nomina de " + this.mes +"/" + this.anio));
         cell.setColspan(5);
         table.addCell(cell);
         // now we add a cell with rowspan 2
@@ -354,44 +353,31 @@ public class Nomina {
         
         table.addCell("Salario Base");
         table.addCell("30 dias");
-        table.addCell(String.valueOf(trabajador.getSalario()/30));
-        table.addCell(String.valueOf(trabajador.getSalario()));
+        table.addCell(String.valueOf(this.importeSalarioMes/30));
+        table.addCell(String.valueOf(this.importeSalarioMes));
         table.addCell("");
         
         
         
         table.addCell("Prorrata");
         table.addCell("30 dias");
-        if(trabajador.hasProrrateo()){
-            table.addCell(String.valueOf(trabajador.getProrrateo()/30));
-            table.addCell(String.valueOf(trabajador.getProrrateo()));
-        }
-        else{
-            table.addCell(" ");
-            table.addCell(" ");
-        }
+        table.addCell(String.valueOf(this.valorProrrateo/30));
+        table.addCell(String.valueOf(this.valorProrrateo));
         table.addCell("");
         
         
         table.addCell("Complemento");
         table.addCell("30 dias");
-        table.addCell(String.valueOf(trabajador.getComplementos()/30));
-        table.addCell(String.valueOf(trabajador.getComplementos()));
+        table.addCell(String.valueOf(this.importeComplementoMes/30));
+        table.addCell(String.valueOf(this.importeComplementoMes));
         table.addCell("");
         
         
         table.addCell("Antiguedad");
-        table.addCell(String.valueOf(trabajador.getTrienios()) + " trienios.");
-        table.addCell(String.valueOf(trabajador.getAntiguedad()/30));
-        table.addCell(String.valueOf(trabajador.getAntiguedad()));
+        table.addCell(String.valueOf(this.numeroTrienios) + " trienios.");
+        table.addCell(String.valueOf(this.importeTrienios/30));
+        table.addCell(String.valueOf(this.importeTrienios));
         table.addCell("");
-        float devengoTotal;
-        if(trabajador.hasProrrateo()){
-            devengoTotal=trabajador.getAntiguedad()+trabajador.getComplementos()+trabajador.getProrrateo()+trabajador.getSalario();
-        }
-        else{
-            devengoTotal=trabajador.getAntiguedad()+trabajador.getComplementos()+trabajador.getSalario();
-        }
         
         cell = new PdfPCell(new Phrase(" "));
         cell.setColspan(5);
@@ -399,28 +385,27 @@ public class Nomina {
         
         table.addCell("Contingencias Generales");
         table.addCell("4.7%");
-        table.addCell("de "+devengoTotal);
+        table.addCell("de "+ this.brutoNomina);
         table.addCell("");
-        table.addCell(String.valueOf(trabajador.getContingencias()));
+        table.addCell(String.valueOf(this.importeSeguridadSocialTrabajador));
         
         table.addCell("Desempleo");
         table.addCell("1.6%");
-        table.addCell("de "+devengoTotal);;
+        table.addCell("de "+ this.brutoNomina);;
         table.addCell("");
-        table.addCell(String.valueOf(trabajador.getDesempleo()));
+        table.addCell(String.valueOf(this.importeDesempleoTrabajador));
         
         table.addCell("Cuota formación");
         table.addCell("0.1%");
-        table.addCell("de "+devengoTotal);;
+        table.addCell("de "+ this.brutoNomina);;
         table.addCell("");
-        table.addCell(String.valueOf(trabajador.getFormacion()));
+        table.addCell(String.valueOf(this.formacionTrabajador));
         
         table.addCell("IRPF");
-        table.addCell(String.valueOf(trabajador.getPorcIRPF()));
-        table.addCell("de "+devengoTotal);;
+        table.addCell(String.valueOf(this.IRPF));
+        table.addCell("de "+this.brutoNomina);;
         table.addCell("");
-        float descuentoTotal=(devengoTotal*(trabajador.getPorcIRPF()/100))+trabajador.getFormacion()+trabajador.getDesempleo()+trabajador.getContingencias();
-        table.addCell(String.valueOf(devengoTotal*(trabajador.getPorcIRPF()/100)));
+        table.addCell(String.valueOf(this.brutoNomina*(this.IRPF/100)));
         
         cell = new PdfPCell(new Phrase(" "));
         cell.setColspan(5);
@@ -429,19 +414,19 @@ public class Nomina {
         cell = new PdfPCell(new Phrase("Total Deducciones"));
         cell.setColspan(4);
         table.addCell(cell);
-        table.addCell(String.valueOf(trabajador.getDescuentos()));
+        table.addCell(String.valueOf(this.brutoNomina - this.liquidoNomina));
         
         cell = new PdfPCell(new Phrase("Total Dev"));
         cell.setColspan(3);
         table.addCell(cell);
-        cell = new PdfPCell(new Phrase(String.valueOf(trabajador.getSalario() + trabajador.getProrrateo()+trabajador.getAntiguedad()+trabajador.getComplementos())));
+        cell = new PdfPCell(new Phrase(String.valueOf(this.importeSalarioMes + this.valorProrrateo+this.importeTrienios + this.importeComplementoMes)));
         cell.setColspan(2);
         table.addCell(cell);
         
         cell = new PdfPCell(new Phrase("Líquido a Percibir"));
         cell.setColspan(4);
         table.addCell(cell); 
-        table.addCell(String.valueOf(devengoTotal-descuentoTotal));
+        table.addCell(String.valueOf(this.liquidoNomina));
 
         return table;
     }
@@ -449,7 +434,7 @@ public class Nomina {
      
      
      
-    private static PdfPTable createSecondTable(Trabajador trabajador) {
+    private  PdfPTable createSecondTable(Trabajador trabajador) {
         // a table with three columns
         PdfPTable table = new PdfPTable(5);
         // the cell object
@@ -465,12 +450,12 @@ public class Nomina {
         table.addCell("");
         table.addCell("");
         table.addCell("");
-        float devengos;
-        if(trabajador.hasProrrateo()){
-            devengos=trabajador.getAntiguedad()+trabajador.getComplementos()+trabajador.getProrrateo()+trabajador.getSalario();
+        double devengos;
+        if(trabajador.isProrrateo()){
+            devengos = this.importeTrienios+this.importeComplementoMes+this.valorProrrateo+ this.importeSalarioMes;
         }
         else{
-            devengos=trabajador.getAntiguedad()+trabajador.getComplementos()+trabajador.getSalario();
+            devengos = this.importeTrienios+this.importeComplementoMes+this.importeSalarioMes;
         }
         table.addCell(String.valueOf(devengos));
         
@@ -511,7 +496,6 @@ public class Nomina {
         
         return table;
     }
-    */
 
     @Override
     public String toString() {

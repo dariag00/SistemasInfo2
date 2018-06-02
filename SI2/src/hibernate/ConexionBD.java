@@ -91,10 +91,10 @@ public class ConexionBD {
         List lista=query.list();
         
         
-        Categoria catTrabajador = new Categoria();
+        Categoria catTrabajador = tra.getCategoria();
         Categorias cat = new Categorias(catTrabajador.getNombreCategoria(), catTrabajador.getSalarioBase(), catTrabajador.getComplemento());
             
-        Empresa emprTrabajador = new Empresa();
+        Empresa emprTrabajador = tra.getEmpresa();
         Empresas empr = new Empresas(emprTrabajador.getNombre(), emprTrabajador.getCIF());
          
         if (lista.isEmpty()) {

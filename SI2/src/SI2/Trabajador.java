@@ -13,10 +13,6 @@ import java.util.Date;
 
 import java.util.ArrayList;
 
-/**
- *
- * @author Mark
- */
 
 
 public class Trabajador {

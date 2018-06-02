@@ -6,10 +6,6 @@ package SI2;
  * and open the template in the editor.
  */
 
-/**
- *
- * @author dariag00
- */
 public class Empresa {
     
     String direccion;

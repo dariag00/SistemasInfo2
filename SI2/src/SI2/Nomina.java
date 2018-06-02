@@ -12,7 +12,7 @@ import java.io.*;
 public class Nomina {
 
     
-    
+    //
     int mes ; 
     int anio ; 
     int numeroTrienios ;

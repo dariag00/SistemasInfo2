@@ -6,6 +6,7 @@
 package SI2;
 
 import com.itextpdf.text.DocumentException;
+import hibernate.ConexionBD;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -123,13 +124,24 @@ public class SI2 {
         }
         
         
-        for(Categoria cate : listaCategorias){
-            cate.toString();
-        }
+       
         
         listaNominas=new ArrayList<>();
         calcularNominas(fecha, sheetData2, listaTrabajadores);
         
+        
+        System.out.println("");
+        
+        ConexionBD conexion = new ConexionBD();
+        for(Categoria cat : listaCategorias){
+            conexion.insertCategorias(cat);
+        }
+        conexion.closeSession();
+        
+        
+        
+        
+        // conexion.insertCategorias(listaCategorias);
         
         
         
@@ -619,6 +631,10 @@ public class SI2 {
             
         }
         
+        
+        //TODO INSERTAR OBJETOS EN BBDD
+        
+        //EN ORDEN, PRIMERO LOS QUE NO DEOENDEN DE NADIE
         
         
         

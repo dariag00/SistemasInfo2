@@ -1,5 +1,13 @@
 package SI2;
 
+import hibernate.HibernateUtil;
+import java.util.Iterator;
+import java.util.List;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import sun.security.pkcs11.wrapper.Functions;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -64,6 +72,22 @@ public class Categoria {
     @Override
     public String toString() {
         return "Categoria{" + "nombreCategoria=" + nombreCategoria + ", salarioBase=" + salarioBase + ", complemento=" + complemento + ", idCategoria=" + idCategoria + '}';
+    }
+    
+    public void toHibernate(){
+        //QUERY
+        //
+        SessionFactory factory1=HibernateUtil.getSessionFactory();
+        Session session = factory1.openSession();
+        Query query = session.createQuery("from Categorias cat where cat.nombreCategoria = :name");
+        query.setString("name",this.nombreCategoria );
+        List lista=query.list();
+        if(lista.isEmpty()){
+            hibernate.Categorias hica = new hibernate.Categorias(this.nombreCategoria, this.salarioBase, this.complemento);
+            session.save(hica);
+        }
+       
+        
     }
     
 }

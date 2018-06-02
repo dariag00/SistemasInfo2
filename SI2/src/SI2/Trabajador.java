@@ -31,7 +31,44 @@ public class Trabajador {
     private int idEmpresa;
     private int idCategoria;
     
+    private Categoria categoria;
+    private Empresa empresa;
     private boolean prorrateo;
+    private static ArrayList<Nomina> listaNominasTrabajador;
+    
+        
+    public Trabajador(){
+        this.apellido2 = "";
+        this.listaNominasTrabajador=new ArrayList<>();
+        
+        correos=new ArrayList<>();
+    }
+
+    public Empresa getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(Empresa empresa) {
+        this.empresa = empresa;
+    }
+    
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
+    }
+    public static ArrayList<Nomina> getListaNominasTrabajador() {
+        return listaNominasTrabajador;
+    }
+
+    public static void setListaNominasTrabajador(ArrayList<Nomina> listaNominasTrabajador) {
+        Trabajador.listaNominasTrabajador = listaNominasTrabajador;
+    }
+    public static void addNomina(Nomina nom){
+        
+    }
 
     public boolean isProrrateo() {
         return prorrateo;
@@ -77,12 +114,7 @@ public class Trabajador {
 
     private static ArrayList<String> correos; 
     
-    
-    public Trabajador(){
-        this.apellido2 = "";
-        
-         correos=new ArrayList<>();
-    }
+
     
     public void setId(int id){
         this.idTrabajador = id;
@@ -96,7 +128,7 @@ public class Trabajador {
         return idEmpresa;
     }
     
-    public void setEmpresa(int idEmpresa){
+    public void setIdEmpresa(int idEmpresa){
         this.idEmpresa = idEmpresa;
     }
     

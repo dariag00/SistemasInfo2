@@ -52,12 +52,63 @@ public class ConexionBD {
         else{
             Transaction tx = session.beginTransaction();
 
-            System.err.println("Hola he entrado en el else: "+cat.getSalarioBase());
             hibernate.Categorias hCateg=(hibernate.Categorias) lista.get(0);
             hCateg.setNombreCategoria(cat.getNombreCategoria());
             hCateg.setSalarioBaseCategoria(cat.getSalarioBase());
             hCateg.setComplementoCategoria(cat.getComplemento());
             session.saveOrUpdate(hCateg);
+            
+            tx.commit();
+        } 
+    }
+    public  void insertEmpresas(Empresa emp){
+        
+        Query query = session.createQuery("from hibernate.Empresas empr where empr.CIF = '" + emp.getCIF() +"'" );
+        
+        List lista=query.list();
+         
+        if (lista.size()==0) {
+            hibernate.Empresas empra = new hibernate.Empresas(emp.getNombre(), emp.getCIF());
+            session.save(empra);
+        }
+        else{
+            Transaction tx = session.beginTransaction();
+
+            hibernate.Empresas hEmp=(hibernate.Empresas) lista.get(0);
+            hEmp.setCif(emp.getCIF());
+            hEmp.setNombre(emp.getNombre());
+            session.saveOrUpdate(hEmp);
+            
+            tx.commit();
+        } 
+    }
+    public  void insertTrabajador(Trabajador tra){
+        
+        if(tra.getDNI().equals("")||tra.getDNI().isEmpty()){
+            return;
+        }
+        
+        Query query = session.createQuery("from hibernate.Trabajador trab where trab.nombre = '" + tra.getNombre() +"'" );
+        Query query2 = session.createQuery("from hibernate.Trabajador trab where trab.NIFNIE = '" + tra.getDNI()+"'" );
+        Query query3 = session.createQuery("from hibernate.Trabajador trab where trab.fechaAlta = '" + tra.getFechaAltaEmpresa()+"'" );
+        
+        List lista=query.list();
+        List lista2=query2.list();
+        List lista3=query3.list();
+         
+        if (lista.size()==0 && lista2.size()==0 && lista3.size()==0) {
+            
+            hibernate.Trabajadorbbdd traba = new hibernate.Trabajadorbbdd(tra.getCategoria(), tra.getEmpresa(), tra.getNombre(), tra.getApellido1(),
+                    tra.getApellido2(), tra.getDNI(), tra.getCorreo(), tra.getFechaAltaEmpresa(), tra.getCorreo(), tra.getIban(), "");
+            session.save(traba);
+        }
+        else{
+            Transaction tx = session.beginTransaction();
+
+            hibernate.Empresas hEmp=(hibernate.Empresas) lista.get(0);
+            hEmp.setCif(emp.getCIF());
+            hEmp.setNombre(emp.getNombre());
+            session.saveOrUpdate(hEmp);
             
             tx.commit();
         } 

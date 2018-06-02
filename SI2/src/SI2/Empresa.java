@@ -8,7 +8,6 @@ package SI2;
 
 public class Empresa {
     
-    String direccion;
     String CIF;
     String nombre;
     int idEmpresa;
@@ -24,9 +23,7 @@ public class Empresa {
         this.nombre = nombre;
     }
 
-    public String getDireccion() {
-        return direccion;
-    }
+    
 
     public String getCIF() {
         return CIF;
@@ -36,9 +33,6 @@ public class Empresa {
         return nombre;
     }
 
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
 
     public void setCIF(String CIF) {
         this.CIF = CIF;
@@ -59,7 +53,7 @@ public class Empresa {
 
     @Override
     public String toString() {
-        return "Empresa{" + "direccion=" + direccion + ", CIF=" + CIF + ", nombre=" + nombre + ", idEmpresa=" + idEmpresa + '}';
+        return "Empresa{" +"CIF=" + CIF + ", nombre=" + nombre + ", idEmpresa=" + idEmpresa + '}';
     }
     
     

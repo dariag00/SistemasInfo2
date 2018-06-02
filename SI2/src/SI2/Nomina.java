@@ -326,14 +326,15 @@ public class Nomina {
         document.add(infoEmpresa);
         document.add(infoEmpleado);
         // step 410/
-        document.add(createFirstTable(employee));
-        document.add(createSecondTable(employee));
+        document.add(createFirstTable());
+        //TODO DESOCMENTAR ESTO
+        //document.add(createSecondTable());
         // step 5
         document.close();
     }
     
      
-    public  PdfPTable createFirstTable(Trabajador trabajador) {
+    public  PdfPTable createFirstTable() {
     	// a table with three columns
         PdfPTable table = new PdfPTable(5);
         // the cell object

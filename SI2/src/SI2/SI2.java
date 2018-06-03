@@ -123,7 +123,6 @@ public class SI2 {
         }
 
 
-
         listaNominas=new ArrayList<>();
         calcularNominas(fecha, sheetData2);
         
@@ -516,15 +515,22 @@ public class SI2 {
         model.Nomina nomi;
         int count=0;
         for(Trabajador trab : listaTrabajadores){
-            
             if(trab.getDNI() != null){
-                count++;;
+                model.Nomina nominaExtra = new Nomina();
+                count++;
                 nomi= new Nomina(); 
                 nomi.setTrabajador(trab);
                 nomi.setIdNomina(count);
                 nomi.setMes(Integer.valueOf(fecha.substring(0,2)));
                 nomi.setAnio(Integer.valueOf(fecha.substring(3,7)));
                 nomi.setNumeroTrienios(trab.getnTrienios());
+                
+                nominaExtra.setTrabajador(trab);
+                nominaExtra.setIdNomina(count);
+                nominaExtra.setMes(Integer.valueOf(fecha.substring(0,2)));
+                nominaExtra.setAnio(Integer.valueOf(fecha.substring(3,7)));
+                nominaExtra.setNumeroTrienios(trab.getnTrienios());
+                
 
                 //Calculamos Trabajador 
                 for(int i = 1; i< sheetData2.size(); i++){
@@ -536,6 +542,10 @@ public class SI2 {
                         nomi.setBrutoAnual(Double.parseDouble(salarCell.toString()));
                         nomi.setImporteComplementoMes(Double.parseDouble(complementCell.toString())/14);
                         nomi.setImporteSalarioMes(Double.parseDouble(salarCell.toString())/14);
+                        
+                        nominaExtra.setBrutoAnual(Double.parseDouble(salarCell.toString()));
+                        nominaExtra.setImporteComplementoMes(Double.parseDouble(complementCell.toString())/14);
+                        nominaExtra.setImporteSalarioMes(Double.parseDouble(salarCell.toString())/14);
                         break;
                     }
 
@@ -548,6 +558,7 @@ public class SI2 {
                     Cell cantTriCell=(Cell) list.get(4);
                     if(nomi.getNumeroTrienios()==Double.valueOf(nTriCell.toString())){
                         nomi.setImporteTrienios(Double.valueOf(cantTriCell.toString()));
+                        nominaExtra.setImporteTrienios(Double.valueOf(cantTriCell.toString()));
                     }
                 }
                 for(int i=49;i>0;i--){
@@ -560,6 +571,7 @@ public class SI2 {
                     else{
                         if(!encontrado){
                             nomi.setIRPF(Double.valueOf(IRPFCell.toString()));
+                            nominaExtra.setIRPF(Double.valueOf(IRPFCell.toString()));
                             encontrado=true;
                         }
 
@@ -575,6 +587,7 @@ public class SI2 {
                     nomi.setValorProrrateo(0);
                 }
                 nomi.setImporteIRPF(nomi.brutoAnual*nomi.getIRPF()/100/14);
+                nominaExtra.setImporteIRPF(nomi.brutoAnual*nominaExtra.getIRPF()/100/14);
 
                 //TODO COMPROBAR ESTOS
 
@@ -612,29 +625,25 @@ public class SI2 {
                 //TODO Aqui me quede
 
                 nomi.setBrutoNomina(nomi.getImporteSalarioMes()+nomi.getImporteTrienios()+nomi.getImporteComplementoMes()+nomi.getValorProrrateo());
-                nomi.setLiquidoNomina(nomi.getBrutoNomina()-(nomi.getImporteDesempleoTrabajador()+nomi.getImporteFormacionTrabajador()+nomi.getImporteSeguridadSocialTrabajador()+nomi.getImporteIRPF()));
-                System.out.println("Bruto de la nómina: "+nomi.getBrutoNomina());
-                System.out.println("Desempleo: "+nomi.getBrutoNomina());
-                System.out.println("Bruto de la nómina: "+nomi.getBrutoNomina());
-                
-                System.err.println(nomi.getLiquidoNomina());
+                nomi.setLiquidoNomina(nomi.getBrutoNomina()-(nomi.getImporteDesempleoTrabajador()+nomi.getImporteFormacionTrabajador()+nomi.getImporteSeguridadSocialTrabajador()+nomi.getImporteIRPF()));     
                 nomi.setCosteTotalEmpresario(nomi.getImporteSalarioMes()+nomi.getImporteDesempleoEmpresario()+nomi.getImporteFOGASAEmpresario()+nomi.getImporteFormacionEmpresario()+nomi.getImporteSeguridadSocialEmpresario());
-
+                
+                nominaExtra.setBrutoNomina(nominaExtra.getImporteSalarioMes()+nominaExtra.getImporteTrienios()+nominaExtra.getImporteComplementoMes()+nominaExtra.getValorProrrateo());
+                nominaExtra.setLiquidoNomina(nominaExtra.getBrutoNomina()-(nominaExtra.getImporteDesempleoTrabajador()+nominaExtra.getImporteFormacionTrabajador()+nominaExtra.getImporteSeguridadSocialTrabajador()+nominaExtra.getImporteIRPF()));     
+                nominaExtra.setCosteTotalEmpresario(nominaExtra.getImporteSalarioMes()+nominaExtra.getImporteDesempleoEmpresario()+nominaExtra.getImporteFOGASAEmpresario()+nominaExtra.getImporteFormacionEmpresario()+nominaExtra.getImporteSeguridadSocialEmpresario());
+                
                 
                 String filename = "nominas/"+trab.getDNI()+"_"+trab.getNombre()+trab.getApellido1()+trab.getApellido2()+"_"+nomi.getMes()+"-"+nomi.getAnio();
-                if(nomi.getMes() == 6 || nomi.getAnio() == 12){
+                listaNominas.add(nomi);
+                nomi.createPdf(filename+".pdf");
+                if(nomi.getMes() == 6 || nomi.getMes() == 12){
                     if(trab.isProrrateo() == false){
-                        //Crear objeto nomina nuevo y añadirlo
-                        Nomina nominaExtra = new Nomina();
-                        nominaExtra.createPdf(filename + "_EXTRA"+".pdf");
+
+                        System.out.println("A:" + nomi.toString() +  " \n " + nominaExtra.toString());
                         listaNominas.add(nominaExtra);
                     }
                 }
-                nomi.createPdf(filename+".pdf");
-                
-                //TODO be happy
 
-                listaNominas.add(nomi);
             }
                
         }

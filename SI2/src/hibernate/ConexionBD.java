@@ -7,12 +7,10 @@ package hibernate;
 
 import java.util.Calendar;
 import java.util.Date;
-import model.SI2;
 import model.Trabajador;
 import model.Empresa;
 import model.Categoria;
 import java.util.List;
-import java.util.Set;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -50,6 +48,7 @@ public class ConexionBD {
          
         if (lista.isEmpty()) {
             hibernate.Categorias hica = new hibernate.Categorias(cat.getNombreCategoria(), cat.getSalarioBase(), cat.getComplemento());
+            hica.setIdCategoria(cat.getIdCategoria());
             session.save(hica);
         }
         else{
@@ -69,7 +68,8 @@ public class ConexionBD {
         List lista=query.list();
         if (lista.isEmpty()) {
             hibernate.Empresas empra = new hibernate.Empresas(emp.getNombre(), emp.getCIF());
-            System.out.println(emp.getCIF());
+            empra.setIdEmpresa(emp.getIdEmpresa());
+            
             session.save(empra);
         }
         else{
@@ -116,6 +116,7 @@ public class ConexionBD {
             
             hibernate.Trabajadorbbdd traba = new hibernate.Trabajadorbbdd(cat, empr, tra.getNombre(), tra.getApellido1(),
                     tra.getApellido2(), tra.getDNI(), tra.getCorreo(), tra.getFechaAltaEmpresa(), tra.getCuenta(), tra.getIban(), null);
+            traba.setIdTrabajador(tra.getIdTrabajador());
             session.save(traba);
         }
         else{
@@ -144,10 +145,30 @@ public class ConexionBD {
     public void insertNomina(model.Nomina nomina){
         
         
+        Query getTrabajadores = session.createQuery("from hibernate.Trabajadorbbdd");
+        List listaTrabajadores = getTrabajadores.list();
+        
+        int id = -1;
+        for(int i = 0; i<listaTrabajadores.size(); i++){
+            Trabajadorbbdd trabajador = (Trabajadorbbdd) listaTrabajadores.get(i);
+            
+            if(trabajador != null){
+                if(nomina.getTrabajador().getDNI().equals(trabajador.getNifnie()))  
+                    id = trabajador.getIdTrabajador();
+            }
+        }
+        if(id == -1)
+            return;
+            //id = nomina.getTrabajador().getIdTrabajador();
+        
+        System.out.println("ID:" + id);
         //TODO Arreglar liquidoNomina
         Query query = session.createQuery("from hibernate.Nomina nom where nom.mes = '" + nomina.getMes()
-                +"' and nom.anio = '" + nomina.getAnio()+"' and nom.trabajadorbbdd = '" + nomina.getTrabajador().getIdTrabajador()
+                +"' and nom.anio = '" + nomina.getAnio()+"' and nom.trabajadorbbdd = '" + id
                 +"' and nom.liquidoNomina = '" + nomina.getLiquidoNomina() +"' and nom.brutoNomina = '" + nomina.getBrutoNomina() + "'");
+        
+        System.out.println("xd " + query.getQueryString());
+        //from hibernate.Nomina nom where nom.mes = '10' and nom.anio = '2010'  and nom.trabajadorbbdd = '2' and nom.liquidoNomina = '1232.6' and nom.brutoNomina = '1411.91'
         
         List lista = query.list();
         
@@ -174,7 +195,7 @@ public class ConexionBD {
                 nomina.getAccidentesTrabajoEmpresario(), nomina.getImporteAccidentesTrabajo(), nomina.getFOGASAEmpresario(), nomina.getImporteFOGASAEmpresario(), 
                 nomina.getSeguridadSocialTrabajador(), nomina.getImporteSeguridadSocialTrabajador(), nomina.getDesempleoTrabajador(), nomina.getImporteDesempleoTrabajador(), 
                 nomina.getFormacionTrabajador(), nomina.getImporteFormacionTrabajador(), nomina.getBrutoNomina(), nomina.getLiquidoNomina(), nomina.getCosteTotalEmpresario());
-            
+          
         session.save(hNomina);
         }else{
             Transaction tx = session.beginTransaction();

@@ -44,9 +44,7 @@ public class SI2 {
     private static XSSFWorkbook workbook;
     private static String nombreArchivo;
     private static XSSFSheet sheet;
-    //
     private static XSSFSheet sheet2;
-    
     private static ArrayList<Trabajador> listaTrabajadores;
     private static int nCu;
     private static int nCuMal;
@@ -122,15 +120,11 @@ public class SI2 {
         }catch(IOException e) {
             System.err.println("Capturada excepcion!");
         }
-        
-        
-       
-        
+
+
+
         listaNominas=new ArrayList<>();
         calcularNominas(fecha, sheetData2);
-        
-        
-        System.out.println("");
         
         ConexionBD conexion = new ConexionBD();
         listaCategorias.forEach((cat) -> {
@@ -147,39 +141,11 @@ public class SI2 {
         
         for(Nomina nomina : listaNominas){
             conexion.insertNomina(nomina);
+            
         }
         
         ConexionBD.closeSession();
-        
-        
-        
-        
-        // conexion.insertCategorias(listaCategorias);
-        
-        
-        
-        /*
-        System.out.println("---------------Categorias-------------");
-        for(Categoria cate : listaCategorias){
-            System.out.println(cate.toString());
-        }
-         System.out.println("---------------Empresas-------------");
-        for(Empresa emp : listaEmpresas){
-            System.out.println(emp.toString());
-        }
-         System.out.println("---------------Trabajadores-------------");
-        for(Trabajador trab : listaTrabajadores){
-            System.out.println(trab.toString());
-        } 
-        System.out.println("---------------Nominas-------------");
-        for(Nomina nomi : listaNominas){
-            System.out.println(nomi.toString());
-        }
-        */
-        
-        
-        
-        
+         
         
     }
     
@@ -544,7 +510,7 @@ public class SI2 {
     
    
 
-    private static void calcularNominas(String fecha, List sheetData2) {
+    private static void calcularNominas(String fecha, List sheetData2) throws IOException, DocumentException {
         
         model.Nomina nomi;
         int count=0;
@@ -648,23 +614,29 @@ public class SI2 {
                 nomi.setLiquidoNomina(nomi.getBrutoNomina()-(nomi.getImporteDesempleoTrabajador()+nomi.getImporteFormacionTrabajador()+nomi.getImporteSeguridadSocialTrabajador()+nomi.getImporteIRPF()));
                 nomi.setCosteTotalEmpresario(nomi.getImporteDesempleoEmpresario()+nomi.getImporteFOGASAEmpresario()+nomi.getImporteFormacionEmpresario()+nomi.getImporteSeguridadSocialEmpresario());
 
+                
+                String filename = "nominas/"+trab.getDNI()+"_"+trab.getNombre()+trab.getApellido1()+trab.getApellido2()+"_"+nomi.getMes()+"-"+nomi.getAnio();
+                if(nomi.getMes() == 6 || nomi.getAnio() == 12){
+                    if(trab.isProrrateo() == false){
+                        //Crear objeto nomina nuevo y añadirlo
+                        Nomina nominaExtra = new Nomina();
+                        nominaExtra.createPdf(filename + "_EXTRA"+".pdf");
+                        listaNominas.add(nominaExtra);
+                    }
+                }
+                nomi.createPdf(filename+".pdf");
 
                 listaNominas.add(nomi);
-                System.out.println(nomi.toString());
             }
+               
         }
-        
-        
 
-        
-        
-        
     }
+        
+        
 
-    
-
-    
-
-    
-   
+        
+        
+        
 }
+

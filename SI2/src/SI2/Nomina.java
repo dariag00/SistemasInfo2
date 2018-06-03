@@ -305,9 +305,8 @@ public class Nomina {
     public void setLiquidoNomina(double liquidoNomina) {
         this.liquidoNomina = liquidoNomina;
     }
-  
-    //TODO Descomentar esto
-     public  void createPdf(String filename, Trabajador employee)
+
+     public  void createPdf(String filename)
         throws IOException, DocumentException {
         
         
@@ -317,34 +316,61 @@ public class Nomina {
         com.itextpdf.text.Document document = new com.itextpdf.text.Document();
         // step 2
         PdfWriter.getInstance(document, new FileOutputStream(filename));
+        Paragraph empty = new Paragraph("   ");
         // step 3
         document.open();
-        Paragraph infoEmpresa = new Paragraph("info empresa\n");
-        Paragraph infoEmpleado = new Paragraph(employee.toString());
-        document.add(infoEmpresa);
-        document.add(infoEmpleado);
-        // step 410/
+        document.add(createInfoEmpresa());
+        document.add(createInfoTRabajador());
         document.add(createFirstTable());
-        //TODO DESOCMENTAR ESTO
-        //document.add(createSecondTable());
+        document.add(empty);
+        document.add(createSecondTable());
         // step 5
         document.close();
     }
-    
+    public  PdfPTable createInfoEmpresa() {
+        PdfPTable tableDatosEmpresa = new PdfPTable(2);
+        Paragraph empty = new Paragraph(""); 
+        Paragraph nom = new Paragraph(trabajador.getEmpresa().getNombre()); 
+        Paragraph cif = new Paragraph(trabajador.getEmpresa().getCIF()); 
+        PdfPCell cell1 = new PdfPCell(); 
+        cell1.addElement(nom); 
+        cell1.addElement(cif); 
+        cell1.addElement(empty); 
+        cell1.setPadding(1); 
+        PdfPCell cell2 = new PdfPCell(new Paragraph()); 
+        cell2.setBorder(Rectangle.NO_BORDER); 
+        tableDatosEmpresa.addCell(cell1);
+        tableDatosEmpresa.addCell(cell2);
+        tableDatosEmpresa.setSpacingAfter(10f); 
+        return tableDatosEmpresa;
+    }
+    public  PdfPTable createInfoTRabajador() {
+        PdfPTable tableDatosTrabajador= new PdfPTable(2);
+        Paragraph empty = new Paragraph("");
+        Paragraph destinatario = new Paragraph("Destinatario: "); 
+        Paragraph nomTrabajador = new Paragraph(trabajador.getNombre()+" "+trabajador.getApellido1()+" "+trabajador.getApellido2());  
+        nomTrabajador.setAlignment(Element.ALIGN_RIGHT); 
+        Paragraph niftrab = new Paragraph("DNI: " +trabajador.getDNI()); 
+        niftrab.setAlignment(Element.ALIGN_RIGHT); 
+        PdfPCell celltrabajador = new PdfPCell();
+        celltrabajador.addElement(destinatario); 
+        celltrabajador.addElement(nomTrabajador); 
+        celltrabajador.addElement(niftrab); 
+        celltrabajador.setIndent(10);   
+        celltrabajador.setPadding(10);
+        tableDatosTrabajador.addCell(celltrabajador); 
+        return tableDatosTrabajador;
+    }
      
     public  PdfPTable createFirstTable() {
-    	// a table with three columns
+
         PdfPTable table = new PdfPTable(5);
-        // the cell object
         PdfPCell cell;
-        // we add a cell with colspan 3
         cell = new PdfPCell(new Phrase("Nomina de " + this.mes +"/" + this.anio));
         cell.setColspan(5);
         table.addCell(cell);
-        // now we add a cell with rowspan 2
         cell = new PdfPCell(new Phrase(""));
         table.addCell(cell);
-        // we add the four remaining cells with addCell()
         table.addCell("cant");
         table.addCell("Imp. Unit");
         table.addCell("Dev.");
@@ -394,7 +420,7 @@ public class Nomina {
         table.addCell("");
         table.addCell(String.valueOf(this.importeDesempleoTrabajador));
         
-        table.addCell("Cuota formación");
+        table.addCell("Cuota formaciÃ³n");
         table.addCell("0.1%");
         table.addCell("de "+ this.brutoNomina);;
         table.addCell("");
@@ -422,7 +448,7 @@ public class Nomina {
         cell.setColspan(2);
         table.addCell(cell);
         
-        cell = new PdfPCell(new Phrase("Líquido a Percibir"));
+        cell = new PdfPCell(new Phrase("LÃ­quido a Percibir"));
         cell.setColspan(4);
         table.addCell(cell); 
         table.addCell(String.valueOf(this.liquidoNomina));
@@ -433,13 +459,13 @@ public class Nomina {
      
      
      
-    private  PdfPTable createSecondTable(Trabajador trabajador) {
+    private  PdfPTable createSecondTable() {
         // a table with three columns
         PdfPTable table = new PdfPTable(5);
         // the cell object
         PdfPCell cell;
         // we add a cell with colspan 3
-        cell = new PdfPCell(new Phrase("Cálculo de coste para el empresario"));
+        cell = new PdfPCell(new Phrase("CÃ¡lculo de coste para el empresario"));
         cell.setColspan(5);
         table.addCell(cell);
         // now we add a cell with rowspan 2
@@ -468,7 +494,7 @@ public class Nomina {
         table.addCell(cell);
         table.addCell(String.valueOf(devengos*6.7/100)); 
         
-        cell = new PdfPCell(new Phrase("Formación 0.6%"));
+        cell = new PdfPCell(new Phrase("FormaciÃ³n 0.6%"));
         cell.setColspan(4);
         table.addCell(cell);
         table.addCell(String.valueOf(devengos*0.6/100)); 
@@ -495,6 +521,7 @@ public class Nomina {
         
         return table;
     }
+
 
     @Override
     public String toString() {

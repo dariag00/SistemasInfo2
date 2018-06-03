@@ -1,3 +1,4 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -573,7 +574,7 @@ public class SI2 {
                 else{
                     nomi.setValorProrrateo(0);
                 }
-                nomi.setImporteIRPF(nomi.brutoAnual*nomi.getIRPF()/100);
+                nomi.setImporteIRPF(nomi.brutoAnual*nomi.getIRPF()/100/14);
 
                 //TODO COMPROBAR ESTOS
 
@@ -608,11 +609,16 @@ public class SI2 {
                 nomi.setFOGASAEmpresario(Double.parseDouble(listFOGASA.get(1).toString()));
                 nomi.setImporteFOGASAEmpresario(nomi.getBaseEmpresario()*nomi.getFOGASAEmpresario()/100);
 
-                //FINAL
+                //TODO Aqui me quede
 
                 nomi.setBrutoNomina(nomi.getImporteSalarioMes()+nomi.getImporteTrienios()+nomi.getImporteComplementoMes()+nomi.getValorProrrateo());
                 nomi.setLiquidoNomina(nomi.getBrutoNomina()-(nomi.getImporteDesempleoTrabajador()+nomi.getImporteFormacionTrabajador()+nomi.getImporteSeguridadSocialTrabajador()+nomi.getImporteIRPF()));
-                nomi.setCosteTotalEmpresario(nomi.getImporteDesempleoEmpresario()+nomi.getImporteFOGASAEmpresario()+nomi.getImporteFormacionEmpresario()+nomi.getImporteSeguridadSocialEmpresario());
+                System.out.println("Bruto de la nómina: "+nomi.getBrutoNomina());
+                System.out.println("Desempleo: "+nomi.getBrutoNomina());
+                System.out.println("Bruto de la nómina: "+nomi.getBrutoNomina());
+                
+                System.err.println(nomi.getLiquidoNomina());
+                nomi.setCosteTotalEmpresario(nomi.getImporteSalarioMes()+nomi.getImporteDesempleoEmpresario()+nomi.getImporteFOGASAEmpresario()+nomi.getImporteFormacionEmpresario()+nomi.getImporteSeguridadSocialEmpresario());
 
                 
                 String filename = "nominas/"+trab.getDNI()+"_"+trab.getNombre()+trab.getApellido1()+trab.getApellido2()+"_"+nomi.getMes()+"-"+nomi.getAnio();
@@ -625,6 +631,8 @@ public class SI2 {
                     }
                 }
                 nomi.createPdf(filename+".pdf");
+                
+                //TODO be happy
 
                 listaNominas.add(nomi);
             }
@@ -632,9 +640,7 @@ public class SI2 {
         }
 
     }
-        
-        
-
+    
         
         
         

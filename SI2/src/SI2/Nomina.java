@@ -12,6 +12,7 @@ import java.io.*;
 public class Nomina {
 
     int mes ; 
+    
     int anio ; 
     int numeroTrienios ;
     double importeTrienios ; 
@@ -53,7 +54,7 @@ public class Nomina {
     }
 
     public void setCosteTotalEmpresario(double costeTotalEmpresario) {
-        this.costeTotalEmpresario = costeTotalEmpresario;
+        this.costeTotalEmpresario = round(costeTotalEmpresario, 2);
     }
 
     public Trabajador getTrabajador() {
@@ -103,7 +104,7 @@ public class Nomina {
     }
 
     public void setImporteTrienios(double importeTrienios) {
-        this.importeTrienios = importeTrienios;
+        this.importeTrienios = round(importeTrienios,2);
     }
 
     public double getImporteSalarioMes() {
@@ -111,7 +112,7 @@ public class Nomina {
     }
 
     public void setImporteSalarioMes(double importeSalarioMes) {
-        this.importeSalarioMes = importeSalarioMes;
+        this.importeSalarioMes = round(importeSalarioMes,2);
     }
 
     public double getImporteComplementoMes() {
@@ -119,7 +120,7 @@ public class Nomina {
     }
 
     public void setImporteComplementoMes(double importeComplementoMes) {
-        this.importeComplementoMes = importeComplementoMes;
+        this.importeComplementoMes = round(importeComplementoMes,2);
     }
 
     public double getValorProrrateo() {
@@ -127,7 +128,7 @@ public class Nomina {
     }
 
     public void setValorProrrateo(double valorProrrateo) {
-        this.valorProrrateo = valorProrrateo;
+        this.valorProrrateo = round(valorProrrateo,2);
     }
 
     public double getBrutoAnual() {
@@ -135,7 +136,7 @@ public class Nomina {
     }
 
     public void setBrutoAnual(double brutoAnual) {
-        this.brutoAnual = brutoAnual;
+        this.brutoAnual = round(brutoAnual,2);
     }
 
     public double getIRPF() {
@@ -151,7 +152,7 @@ public class Nomina {
     }
 
     public void setImporteIRPF(double importeIPRF) {
-        this.importeIRPF = importeIPRF;
+        this.importeIRPF = round(importeIPRF,2);
     }
 
     public double getBaseEmpresario() {
@@ -159,7 +160,7 @@ public class Nomina {
     }
 
     public void setBaseEmpresario(double baseEmpresario) {
-        this.baseEmpresario = baseEmpresario;
+        this.baseEmpresario = round(baseEmpresario,2);
     }
 
     public double getSeguridadSocialEmpresario() {
@@ -175,7 +176,7 @@ public class Nomina {
     }
 
     public void setImporteSeguridadSocialEmpresario(double importeSeguridadSocialEmpresario) {
-        this.importeSeguridadSocialEmpresario = importeSeguridadSocialEmpresario;
+        this.importeSeguridadSocialEmpresario = round(importeSeguridadSocialEmpresario,2);
     }
 
     public double getDesempleoEmpresario() {
@@ -191,7 +192,7 @@ public class Nomina {
     }
 
     public void setImporteDesempleoEmpresario(double importeDesempleoEmpresario) {
-        this.importeDesempleoEmpresario = importeDesempleoEmpresario;
+        this.importeDesempleoEmpresario = round(importeDesempleoEmpresario,2);
     }
 
     public double getFormacionEmpresario() {
@@ -207,7 +208,7 @@ public class Nomina {
     }
 
     public void setImporteFormacionEmpresario(double importeFormacionEmpresario) {
-        this.importeFormacionEmpresario = importeFormacionEmpresario;
+        this.importeFormacionEmpresario = round(importeFormacionEmpresario,2);
     }
 
     public double getAccidentesTrabajoEmpresario() {
@@ -223,7 +224,7 @@ public class Nomina {
     }
 
     public void setImporteAccidentesTrabajo(double importeAccidentesTrabajo) {
-        this.importeAccidentesTrabajo = importeAccidentesTrabajo;
+        this.importeAccidentesTrabajo = round(importeAccidentesTrabajo,2);
     }
 
     public double getFOGASAEmpresario() {
@@ -239,7 +240,7 @@ public class Nomina {
     }
 
     public void setImporteFOGASAEmpresario(double importeFOGASAEmpresario) {
-        this.importeFOGASAEmpresario = importeFOGASAEmpresario;
+        this.importeFOGASAEmpresario = round(importeFOGASAEmpresario,2);
     }
 
     public double getSeguridadSocialTrabajador() {
@@ -255,7 +256,7 @@ public class Nomina {
     }
 
     public void setImporteSeguridadSocialTrabajador(double importeSeguridadSocialTrabajador) {
-        this.importeSeguridadSocialTrabajador = importeSeguridadSocialTrabajador;
+        this.importeSeguridadSocialTrabajador = round(importeSeguridadSocialTrabajador,2);
     }
 
     public double getDesempleoTrabajador() {
@@ -271,7 +272,7 @@ public class Nomina {
     }
 
     public void setImporteDesempleoTrabajador(double importeDesempleoTrabajador) {
-        this.importeDesempleoTrabajador = importeDesempleoTrabajador;
+        this.importeDesempleoTrabajador = round(importeDesempleoTrabajador,2);
     }
 
     public double getFormacionTrabajador() {
@@ -287,7 +288,7 @@ public class Nomina {
     }
 
     public void setImporteFormacionTrabajador(double importeFormacionTrabajador) {
-        this.importeFormacionTrabajador = importeFormacionTrabajador;
+        this.importeFormacionTrabajador = round(importeFormacionTrabajador,2);
     }
 
     public double getBrutoNomina() {
@@ -295,7 +296,7 @@ public class Nomina {
     }
 
     public void setBrutoNomina(double brutoNomina) {
-        this.brutoNomina = brutoNomina;
+        this.brutoNomina = round(brutoNomina,2);
     }
 
     public double getLiquidoNomina() {
@@ -303,7 +304,7 @@ public class Nomina {
     }
 
     public void setLiquidoNomina(double liquidoNomina) {
-        this.liquidoNomina = liquidoNomina;
+        this.liquidoNomina = round(liquidoNomina,2);
     }
 
      public  void createPdf(String filename)
@@ -420,7 +421,7 @@ public class Nomina {
         table.addCell("");
         table.addCell(String.valueOf(this.importeDesempleoTrabajador));
         
-        table.addCell("Cuota formaciÃ³n");
+        table.addCell("Cuota formación");
         table.addCell("0.1%");
         table.addCell("de "+ this.brutoNomina);;
         table.addCell("");
@@ -494,7 +495,7 @@ public class Nomina {
         table.addCell(cell);
         table.addCell(String.valueOf(devengos*6.7/100)); 
         
-        cell = new PdfPCell(new Phrase("FormaciÃ³n 0.6%"));
+        cell = new PdfPCell(new Phrase("Formación 0.6%"));
         cell.setColspan(4);
         table.addCell(cell);
         table.addCell(String.valueOf(devengos*0.6/100)); 
@@ -529,7 +530,16 @@ public class Nomina {
     }
 
     
+    private static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
 
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
+    }
+        
+        
   
     
     

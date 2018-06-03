@@ -630,3 +630,6 @@ SI2/.~lock.SistemasInformacionII.xlsx#
 SI2.zip
 SI2/nbproject/project.xml
 SI2/nbproject/build-impl.xml
+*.pdf
+*.class
+*.xlsx#

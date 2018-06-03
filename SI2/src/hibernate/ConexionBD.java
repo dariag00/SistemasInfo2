@@ -144,10 +144,10 @@ public class ConexionBD {
     public void insertNomina(model.Nomina nomina){
         
         
-        //TODO cambiar liquidoNomina
+        //TODO Arreglar liquidoNomina
         Query query = session.createQuery("from hibernate.Nomina nom where nom.mes = '" + nomina.getMes()
                 +"' and nom.anio = '" + nomina.getAnio()+"' and nom.trabajadorbbdd = '" + nomina.getTrabajador().getIdTrabajador()
-                +"' and nom.liquidoNomina = '" + 0 +"' and nom.brutoNomina = '" + 0 + "'");
+                +"' and nom.liquidoNomina = '" + nomina.getLiquidoNomina() +"' and nom.brutoNomina = '" + nomina.getBrutoNomina() + "'");
         
         List lista = query.list();
         
@@ -167,18 +167,16 @@ public class ConexionBD {
         System.out.println(lista.size());
         
         if(lista.isEmpty()){
-            //Cambiar liquidonomina
-            hibernate.Nomina hNomina = new hibernate.Nomina(trabajador, nomina.getMes(), nomina.getAnio(), nomina.getNumeroTrienios(), nomina.getImporteTrienios(), 
+        hibernate.Nomina hNomina = new hibernate.Nomina(trabajador, nomina.getMes(), nomina.getAnio(), nomina.getNumeroTrienios(), nomina.getImporteTrienios(), 
                 nomina.getImporteSalarioMes(), nomina.getImporteComplementoMes(), nomina.getValorProrrateo(), nomina.getBrutoAnual(), nomina.getIRPF(), 
                 nomina.getImporteIRPF(), nomina.getBaseEmpresario(), nomina.getSeguridadSocialEmpresario(), nomina.getImporteSeguridadSocialEmpresario(), 
                 nomina.getDesempleoEmpresario(), nomina.getImporteDesempleoEmpresario(), nomina.getFormacionEmpresario(), nomina.getImporteFormacionEmpresario(), 
                 nomina.getAccidentesTrabajoEmpresario(), nomina.getImporteAccidentesTrabajo(), nomina.getFOGASAEmpresario(), nomina.getImporteFOGASAEmpresario(), 
                 nomina.getSeguridadSocialTrabajador(), nomina.getImporteSeguridadSocialTrabajador(), nomina.getDesempleoTrabajador(), nomina.getImporteDesempleoTrabajador(), 
-                nomina.getFormacionTrabajador(), nomina.getImporteFormacionTrabajador(), 0, 0, nomina.getCosteTotalEmpresario());
+                nomina.getFormacionTrabajador(), nomina.getImporteFormacionTrabajador(), nomina.getBrutoNomina(), nomina.getLiquidoNomina(), nomina.getCosteTotalEmpresario());
             
-                session.save(hNomina);
+        session.save(hNomina);
         }else{
-            //TODO descomentar liquidonomina
             Transaction tx = session.beginTransaction();
             hibernate.Nomina hNomina = (hibernate.Nomina) lista.get(0);
             
@@ -208,8 +206,8 @@ public class ConexionBD {
             
             hNomina.setFormacionTrabajador(nomina.getFormacionTrabajador());
             hNomina.setImporteFormacionTrabajador(nomina.getImporteFormacionTrabajador());
-            //hNomina.setBrutoNomina(nomina.getBrutoNomina());
-            //hNomina.setLiquidoNomina(nomina.getLiquidoNomina());
+            hNomina.setBrutoNomina(nomina.getBrutoNomina());
+            hNomina.setLiquidoNomina(nomina.getLiquidoNomina());
             hNomina.setCosteTotalEmpresario(nomina.getCosteTotalEmpresario());
             
             hNomina.setIrpf(nomina.getIRPF());
@@ -217,6 +215,7 @@ public class ConexionBD {
             hNomina.setValorProrrateo(nomina.getValorProrrateo());
             hNomina.setImporteComplementoMes(nomina.getImporteComplementoMes());
             hNomina.setImporteSalarioMes(nomina.getImporteSalarioMes());
+            //TODO comprobar
      
             session.update(hNomina);
             tx.commit();

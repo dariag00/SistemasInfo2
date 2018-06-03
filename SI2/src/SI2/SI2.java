@@ -6,8 +6,8 @@
 package SI2;
 
 import com.itextpdf.text.DocumentException;
-import hibernate.ConexionBD;
 import java.io.File;
+import hibernate.ConexionBD;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -134,7 +134,15 @@ public class SI2 {
         
         ConexionBD conexion = new ConexionBD();
         for(Categoria cat : listaCategorias){
-            conexion.insertCategorias(cat);
+            conexion.insertCategoria(cat);
+        }
+        
+        for(Empresa empr : listaEmpresas){
+            conexion.insertEmpresa(empr);
+        }
+        
+        for(Trabajador trab : listaTrabajadores){
+            conexion.insertTrabajador(trab);
         }
         conexion.closeSession();
         
@@ -249,6 +257,7 @@ public class SI2 {
                 nombreEmpresa=cellEmpr.toString();
                 cifEmpresa = cellCifEmpr.toString();
                 Empresa empr = new Empresa(nombreEmpresa, cifEmpresa);
+                trab.setEmpresa(empr);
                 //TODO añadir direccion
                 
                 for(Empresa empresa:listaEmpresas){
@@ -256,11 +265,11 @@ public class SI2 {
                         listaEmpresas.add(new Empresa(nombreEmpresa, cifEmpresa));
                     }
                 }
-                trab.setEmpresa(empr.getIdEmpresa());
+                //trab.setEmpresa(empr.getIdEmpresa());
                 
                 for(Categoria cate : listaCategorias){
-                    if(cate.nombreCategoria.equals(cellCategoria.toString())){
-                        trab.setIdCategoria(cate.idCategoria);
+                    if(cate.getNombreCategoria().equals(cellCategoria.toString())){
+                        trab.setCategoria(cate);
                     
                     }
                 }
@@ -542,7 +551,7 @@ public class SI2 {
                 Cell complementCell= (Cell) list.get(2);
                 Cell salarCell = (Cell) list.get(1);
                 Cell categCell = (Cell) list.get(0);
-                if((listaCategorias.get((trab.getIdCategoria())-1).nombreCategoria).equals(categCell.toString())){
+                if((listaCategorias.get((trab.getCategoria().getIdCategoria())-1).nombreCategoria).equals(categCell.toString())){
                     nomi.setBrutoAnual(Double.parseDouble(salarCell.toString()));
                     nomi.setImporteComplementoMes(Double.parseDouble(complementCell.toString())/14);
                     nomi.setImporteSalarioMes(Double.parseDouble(salarCell.toString())/14);

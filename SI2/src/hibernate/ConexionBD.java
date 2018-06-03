@@ -36,7 +36,7 @@ public class ConexionBD {
         HibernateUtil.shutdown();
     }
     
-    public  void insertCategorias(Categoria cat){
+    public  void insertCategoria(Categoria cat){
         
         Query query = session.createQuery("from hibernate.Categorias cate where cate.nombreCategoria = '" + cat.getNombreCategoria() +"'" );
         
@@ -58,7 +58,7 @@ public class ConexionBD {
             tx.commit();
         } 
     }
-    public  void insertEmpresas(Empresa emp){
+    public  void insertEmpresa(Empresa emp){
         
         Query query = session.createQuery("from hibernate.Empresas empr where empr.CIF = '" + emp.getCIF() +"'" );
         
@@ -85,8 +85,8 @@ public class ConexionBD {
             return;
         }
         
-        Query query = session.createQuery("from hibernate.Trabajador trab where trab.nombre = '" + tra.getNombre() 
-                +"' and trab.NIFNIE = '" + tra.getDNI()+"' and trab.fechaAlta = '" + tra.getFechaAltaEmpresa()+"'" );
+        Query query = session.createQuery("from hibernate.Trabajadorbbdd trab where trab.nombre = '" + tra.getNombre() 
+                +"' and trab.nifnie = '" + tra.getDNI()+"' and trab.fechaAlta = '" + tra.getFechaAltaEmpresa()+"'" );
  
         List lista=query.list();
         
@@ -124,6 +124,11 @@ public class ConexionBD {
             
             tx.commit();
         } 
+    }
+    
+    
+    public void insertNomina(Nomina nomina){
+        
     }
 
     

@@ -28,8 +28,6 @@ public class Trabajador {
     private Date fechaAltaEmpresa;
     private String cuenta;
     private String iban;
-    private int idEmpresa;
-    private int idCategoria;
     
     private Categoria categoria;
     private Empresa empresa;
@@ -96,13 +94,6 @@ public class Trabajador {
         this.idTrabajador = idTrabajador;
     }
 
-    public int getIdCategoria() {
-        return idCategoria;
-    }
-
-    public void setIdCategoria(int idCategoria) {
-        this.idCategoria = idCategoria;
-    }
 
     public static ArrayList<String> getCorreos() {
         return correos;
@@ -123,14 +114,7 @@ public class Trabajador {
     public int getId(){
         return idTrabajador;
     }
-    
-    public int getIdEmpresa(){
-        return idEmpresa;
-    }
-    
-    public void setIdEmpresa(int idEmpresa){
-        this.idEmpresa = idEmpresa;
-    }
+   
     
     public String getCorreo(){
         return correo;
@@ -374,7 +358,7 @@ public class Trabajador {
     }
     @Override
     public String toString() {
-        return "Trabajador{" + "idTrabajador=" + idTrabajador + ", nombre=" + nombre + ", apellido1=" + apellido1 + ", apellido2=" + apellido2 + ", DNI=" + DNI + ", correo=" + correo + ", fechaAltaEmpresa=" + fechaAltaEmpresa + ", cuenta=" + cuenta + ", iban=" + iban + ", idEmpresa=" + idEmpresa + ", idCategoria=" + idCategoria + ", prorrateo=" + prorrateo + ", nTrienios=" + nTrienios + '}';
+        return "Trabajador{" + "idTrabajador=" + idTrabajador + ", nombre=" + nombre + ", apellido1=" + apellido1 + ", apellido2=" + apellido2 + ", DNI=" + DNI + ", correo=" + correo + ", fechaAltaEmpresa=" + fechaAltaEmpresa + ", cuenta=" + cuenta + ", iban=" + iban + ", prorrateo=" + prorrateo + ", nTrienios=" + nTrienios + '}';
     }
 }
 

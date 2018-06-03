@@ -1,4 +1,4 @@
-package SI2;
+package model;
 
 import hibernate.HibernateUtil;
 import java.util.Iterator;

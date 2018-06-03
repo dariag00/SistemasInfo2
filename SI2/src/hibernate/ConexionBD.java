@@ -5,8 +5,14 @@
  */
 package hibernate;
 
-import SI2.*;
+import java.util.Calendar;
+import java.util.Date;
+import model.SI2;
+import model.Trabajador;
+import model.Empresa;
+import model.Categoria;
 import java.util.List;
+import java.util.Set;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -59,13 +65,11 @@ public class ConexionBD {
         } 
     }
     public  void insertEmpresa(Empresa emp){
-        
-        Query query = session.createQuery("from hibernate.Empresas empr where empr.CIF = '" + emp.getCIF() +"'" );
-        
+        Query query = session.createQuery("from hibernate.Empresas empr where empr.cif = '" + emp.getCIF() +"'" );
         List lista=query.list();
-         
         if (lista.isEmpty()) {
             hibernate.Empresas empra = new hibernate.Empresas(emp.getNombre(), emp.getCIF());
+            System.out.println(emp.getCIF());
             session.save(empra);
         }
         else{
@@ -77,37 +81,48 @@ public class ConexionBD {
             session.saveOrUpdate(hEmp);
             
             tx.commit();
-        } 
+        }
     }
     public  void insertTrabajador(Trabajador tra){
         
-        if(tra.getDNI().equals("")||tra.getDNI().isEmpty()){
+        if(tra.getDNI() == null || tra.getDNI().isEmpty()){
             return;
         }
         
+        Date date = tra.getFechaAltaEmpresa();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date); 
+        int mes = cal.get(Calendar.MONTH) + 1;
+        String fecha = cal.get(Calendar.YEAR) + "-" + mes + "-" + cal.get(Calendar.DAY_OF_MONTH);  
+                        
         Query query = session.createQuery("from hibernate.Trabajadorbbdd trab where trab.nombre = '" + tra.getNombre() 
-                +"' and trab.nifnie = '" + tra.getDNI()+"' and trab.fechaAlta = '" + tra.getFechaAltaEmpresa()+"'" );
+                +"' and trab.nifnie = '" + tra.getDNI()+"' and trab.fechaAlta = '" + fecha +"'" );
  
         List lista=query.list();
         
         
         Categoria catTrabajador = tra.getCategoria();
-        Categorias cat = new Categorias(catTrabajador.getNombreCategoria(), catTrabajador.getSalarioBase(), catTrabajador.getComplemento());
+        //Categorias cat = new Categorias(catTrabajador.getNombreCategoria(), catTrabajador.getSalarioBase(), catTrabajador.getComplemento());
+        
+        Query getCagetoria = session.createQuery("from hibernate.Categorias cate where cate.nombreCategoria = '" + catTrabajador.getNombreCategoria() +"'" );
+        Categorias cat = (Categorias) getCagetoria.list().get(0);
             
         Empresa emprTrabajador = tra.getEmpresa();
-        Empresas empr = new Empresas(emprTrabajador.getNombre(), emprTrabajador.getCIF());
+        Query getEmpresa = session.createQuery("from hibernate.Empresas empr where empr.cif = '" + emprTrabajador.getCIF() +"'" );
+        //Empresas empr = new Empresas(emprTrabajador.getNombre(), emprTrabajador.getCIF());
+        Empresas empr = (Empresas) getEmpresa.list().get(0);
          
         if (lista.isEmpty()) {
             
             hibernate.Trabajadorbbdd traba = new hibernate.Trabajadorbbdd(cat, empr, tra.getNombre(), tra.getApellido1(),
-                    tra.getApellido2(), tra.getDNI(), tra.getCorreo(), tra.getFechaAltaEmpresa(), tra.getCorreo(), tra.getIban(), null);
+                    tra.getApellido2(), tra.getDNI(), tra.getCorreo(), tra.getFechaAltaEmpresa(), tra.getCuenta(), tra.getIban(), null);
             session.save(traba);
         }
         else{
             Transaction tx = session.beginTransaction();
 
             Trabajadorbbdd trabajador =(Trabajadorbbdd) lista.get(0);
-            
+
             trabajador.setApellido1(tra.getApellido1());
             trabajador.setApellido2(tra.getApellido2());
             trabajador.setCategorias(cat);
@@ -116,18 +131,97 @@ public class ConexionBD {
             trabajador.setEmpresas(empr);
             trabajador.setFechaAlta(tra.getFechaAltaEmpresa());
             trabajador.setIban(tra.getIban());
-            trabajador.setIdTrabajador(tra.getId());
             trabajador.setNifnie(tra.getDNI());
             trabajador.setNombre(tra.getNombre());
              
-            session.saveOrUpdate(trabajador);
+            session.update(trabajador);
             
             tx.commit();
         } 
     }
     
     
-    public void insertNomina(Nomina nomina){
+    public void insertNomina(model.Nomina nomina){
+        
+        
+        //TODO cambiar liquidoNomina
+        Query query = session.createQuery("from hibernate.Nomina nom where nom.mes = '" + nomina.getMes()
+                +"' and nom.anio = '" + nomina.getAnio()+"' and nom.trabajadorbbdd = '" + nomina.getTrabajador().getIdTrabajador()
+                +"' and nom.liquidoNomina = '" + 0 +"' and nom.brutoNomina = '" + 0 + "'");
+        
+        List lista = query.list();
+        
+        Trabajador tra = nomina.getTrabajador();
+      
+
+        Date date = tra.getFechaAltaEmpresa();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date); 
+        int mes = cal.get(Calendar.MONTH) + 1;
+        String fecha = cal.get(Calendar.YEAR) + "-" + mes + "-" + cal.get(Calendar.DAY_OF_MONTH); 
+
+        Query getTrabajador = session.createQuery("from hibernate.Trabajadorbbdd trab where trab.nombre = '" + tra.getNombre() 
+                +"' and trab.nifnie = '" + tra.getDNI()+"' and trab.fechaAlta = '" + fecha +"'" );
+        Trabajadorbbdd trabajador = (Trabajadorbbdd) getTrabajador.list().get(0);
+        
+        System.out.println(lista.size());
+        
+        if(lista.isEmpty()){
+            //Cambiar liquidonomina
+            hibernate.Nomina hNomina = new hibernate.Nomina(trabajador, nomina.getMes(), nomina.getAnio(), nomina.getNumeroTrienios(), nomina.getImporteTrienios(), 
+                nomina.getImporteSalarioMes(), nomina.getImporteComplementoMes(), nomina.getValorProrrateo(), nomina.getBrutoAnual(), nomina.getIRPF(), 
+                nomina.getImporteIRPF(), nomina.getBaseEmpresario(), nomina.getSeguridadSocialEmpresario(), nomina.getImporteSeguridadSocialEmpresario(), 
+                nomina.getDesempleoEmpresario(), nomina.getImporteDesempleoEmpresario(), nomina.getFormacionEmpresario(), nomina.getImporteFormacionEmpresario(), 
+                nomina.getAccidentesTrabajoEmpresario(), nomina.getImporteAccidentesTrabajo(), nomina.getFOGASAEmpresario(), nomina.getImporteFOGASAEmpresario(), 
+                nomina.getSeguridadSocialTrabajador(), nomina.getImporteSeguridadSocialTrabajador(), nomina.getDesempleoTrabajador(), nomina.getImporteDesempleoTrabajador(), 
+                nomina.getFormacionTrabajador(), nomina.getImporteFormacionTrabajador(), 0, 0, nomina.getCosteTotalEmpresario());
+            
+                session.save(hNomina);
+        }else{
+            //TODO descomentar liquidonomina
+            Transaction tx = session.beginTransaction();
+            hibernate.Nomina hNomina = (hibernate.Nomina) lista.get(0);
+            
+            hNomina.setTrabajadorbbdd(trabajador);
+            hNomina.setNumeroTrienios(nomina.getNumeroTrienios());
+            hNomina.setImporteTrienios(nomina.getImporteTrienios());
+                
+            hNomina.setImporteIrpf(nomina.getIRPF());
+            hNomina.setBaseEmpresario(nomina.getBaseEmpresario());
+            hNomina.setSeguridadSocialEmpresario(nomina.getSeguridadSocialEmpresario());
+            hNomina.setImporteSeguridadSocialEmpresario(nomina.getImporteSeguridadSocialEmpresario());
+            
+            hNomina.setDesempleoEmpresario(nomina.getDesempleoEmpresario());
+            hNomina.setImporteDesempleoEmpresario(nomina.getImporteDesempleoEmpresario());
+            hNomina.setFormacionEmpresario(nomina.getFormacionEmpresario());
+            hNomina.setImporteFormacionEmpresario(nomina.getImporteFormacionEmpresario());
+            
+            hNomina.setAccidentesTrabajoEmpresario(nomina.getAccidentesTrabajoEmpresario());
+            hNomina.setImporteAccidentesTrabajoEmpresario(nomina.getImporteAccidentesTrabajo());
+            hNomina.setFogasaempresario(nomina.getFOGASAEmpresario());
+            hNomina.setImporteFogasaempresario(nomina.getImporteFOGASAEmpresario());
+            
+            hNomina.setSeguridadSocialTrabajador(nomina.getSeguridadSocialTrabajador());
+            hNomina.setImporteSeguridadSocialTrabajador(nomina.getImporteSeguridadSocialTrabajador());
+            hNomina.setDesempleoTrabajador(nomina.getDesempleoTrabajador());
+            hNomina.setImporteDesempleoTrabajador(nomina.getImporteDesempleoTrabajador());
+            
+            hNomina.setFormacionTrabajador(nomina.getFormacionTrabajador());
+            hNomina.setImporteFormacionTrabajador(nomina.getImporteFormacionTrabajador());
+            //hNomina.setBrutoNomina(nomina.getBrutoNomina());
+            //hNomina.setLiquidoNomina(nomina.getLiquidoNomina());
+            hNomina.setCosteTotalEmpresario(nomina.getCosteTotalEmpresario());
+            
+            hNomina.setIrpf(nomina.getIRPF());
+            hNomina.setBrutoAnual(nomina.getBrutoAnual());
+            hNomina.setValorProrrateo(nomina.getValorProrrateo());
+            hNomina.setImporteComplementoMes(nomina.getImporteComplementoMes());
+            hNomina.setImporteSalarioMes(nomina.getImporteSalarioMes());
+     
+            session.update(hNomina);
+            tx.commit();
+            
+        }
         
     }
 

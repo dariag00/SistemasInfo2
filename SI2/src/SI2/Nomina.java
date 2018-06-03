@@ -1,4 +1,4 @@
-package SI2;
+package model;
 
 
 import com.itextpdf.text.*;
@@ -11,8 +11,6 @@ import java.io.*;
 
 public class Nomina {
 
-    
-    //
     int mes ; 
     int anio ; 
     int numeroTrienios ;
@@ -43,8 +41,12 @@ public class Nomina {
     double brutoNomina ;  
     double liquidoNomina ;
     double costeTotalEmpresario ;
-    int idTrabajador ;
+    Trabajador trabajador;
     int idNomina ;
+    
+    public Nomina(){
+        trabajador = null;
+    }
 
     public double getCosteTotalEmpresario() {
         return costeTotalEmpresario;
@@ -54,12 +56,12 @@ public class Nomina {
         this.costeTotalEmpresario = costeTotalEmpresario;
     }
 
-    public int getIdTrabajador() {
-        return idTrabajador;
+    public Trabajador getTrabajador() {
+        return trabajador;
     }
 
-    public void setIdTrabajador(int idTrabajador) {
-        this.idTrabajador = idTrabajador;
+    public void setTrabajador(Trabajador trabajador) {
+        this.trabajador = trabajador;
     }
 
     public int getIdNomina() {
@@ -303,11 +305,7 @@ public class Nomina {
     public void setLiquidoNomina(double liquidoNomina) {
         this.liquidoNomina = liquidoNomina;
     }
-    
-    
-    public Nomina(){
-        
-    }
+  
     //TODO Descomentar esto
      public  void createPdf(String filename, Trabajador employee)
         throws IOException, DocumentException {
@@ -500,7 +498,7 @@ public class Nomina {
 
     @Override
     public String toString() {
-        return "Nomina{" + "mes=" + mes + ", anio=" + anio + ", numeroTrienios=" + numeroTrienios + ", importeTrienios=" + importeTrienios + ", importeSalarioMes=" + importeSalarioMes + ", importeComplementoMes=" + importeComplementoMes + ", valorProrrateo=" + valorProrrateo + ", brutoAnual=" + brutoAnual + ", IRPF=" + IRPF + ", importeIRPF=" + importeIRPF + ", baseEmpresario=" + baseEmpresario + ", seguridadSocialEmpresario=" + seguridadSocialEmpresario + ", importeSeguridadSocialEmpresario=" + importeSeguridadSocialEmpresario + ", desempleoEmpresario=" + desempleoEmpresario + ", importeDesempleoEmpresario=" + importeDesempleoEmpresario + ", formacionEmpresario=" + formacionEmpresario + ", importeFormacionEmpresario=" + importeFormacionEmpresario + ", accidentesTrabajoEmpresario=" + accidentesTrabajoEmpresario + ", importeAccidentesTrabajo=" + importeAccidentesTrabajo + ", FOGASAEmpresario=" + FOGASAEmpresario + ", importeFOGASAEmpresario=" + importeFOGASAEmpresario + ", seguridadSocialTrabajador=" + seguridadSocialTrabajador + ", importeSeguridadSocialTrabajador=" + importeSeguridadSocialTrabajador + ", desempleoTrabajador=" + desempleoTrabajador + ", importeDesempleoTrabajador=" + importeDesempleoTrabajador + ", formacionTrabajador=" + formacionTrabajador + ", importeFormacionTrabajador=" + importeFormacionTrabajador + ", brutoNomina=" + brutoNomina + ", liquidoNomina=" + liquidoNomina + ", costeTotalEmpresario=" + costeTotalEmpresario + ", idTrabajador=" + idTrabajador + ", idNomina=" + idNomina + '}';
+        return "Nomina{" + " " + trabajador.getIdTrabajador() + " nom " + idNomina + "mes=" + mes + ", anio=" + anio + ", numeroTrienios=" + numeroTrienios + ", importeTrienios=" + importeTrienios + ", importeSalarioMes=" + importeSalarioMes + ", importeComplementoMes=" + importeComplementoMes + ", valorProrrateo=" + valorProrrateo + ", brutoAnual=" + brutoAnual + ", IRPF=" + IRPF + ", importeIRPF=" + importeIRPF + ", baseEmpresario=" + baseEmpresario + ", seguridadSocialEmpresario=" + seguridadSocialEmpresario + ", importeSeguridadSocialEmpresario=" + importeSeguridadSocialEmpresario + ", desempleoEmpresario=" + desempleoEmpresario + ", importeDesempleoEmpresario=" + importeDesempleoEmpresario + ", formacionEmpresario=" + formacionEmpresario + ", importeFormacionEmpresario=" + importeFormacionEmpresario + ", accidentesTrabajoEmpresario=" + accidentesTrabajoEmpresario + ", importeAccidentesTrabajo=" + importeAccidentesTrabajo + ", FOGASAEmpresario=" + FOGASAEmpresario + ", importeFOGASAEmpresario=" + importeFOGASAEmpresario + ", seguridadSocialTrabajador=" + seguridadSocialTrabajador + ", importeSeguridadSocialTrabajador=" + importeSeguridadSocialTrabajador + ", desempleoTrabajador=" + desempleoTrabajador + ", importeDesempleoTrabajador=" + importeDesempleoTrabajador + ", formacionTrabajador=" + formacionTrabajador + ", importeFormacionTrabajador=" + importeFormacionTrabajador + ", brutoNomina=" + brutoNomina + ", liquidoNomina=" + liquidoNomina + ", costeTotalEmpresario=" + costeTotalEmpresario + ", idNomina=" + idNomina + '}';
     }
 
     

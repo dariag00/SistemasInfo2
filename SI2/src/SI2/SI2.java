@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package SI2;
+package model;
 
 import com.itextpdf.text.DocumentException;
 import java.io.File;
@@ -53,7 +53,7 @@ public class SI2 {
     private static String fecha;
     private static ArrayList<Empresa> listaEmpresas;
     private static ArrayList<Categoria> listaCategorias;
-    private static ArrayList<Nomina> listaNominas;
+    private static ArrayList<model.Nomina> listaNominas;
 
     /**
      * @param args the command line arguments
@@ -127,24 +127,29 @@ public class SI2 {
        
         
         listaNominas=new ArrayList<>();
-        calcularNominas(fecha, sheetData2, listaTrabajadores);
+        calcularNominas(fecha, sheetData2);
         
         
         System.out.println("");
         
         ConexionBD conexion = new ConexionBD();
-        for(Categoria cat : listaCategorias){
+        listaCategorias.forEach((cat) -> {
             conexion.insertCategoria(cat);
-        }
+        });
         
-        for(Empresa empr : listaEmpresas){
+        listaEmpresas.forEach((empr) -> {
             conexion.insertEmpresa(empr);
-        }
+        });
         
         for(Trabajador trab : listaTrabajadores){
             conexion.insertTrabajador(trab);
         }
-        conexion.closeSession();
+        
+        for(Nomina nomina : listaNominas){
+            conexion.insertNomina(nomina);
+        }
+        
+        ConexionBD.closeSession();
         
         
         
@@ -200,7 +205,7 @@ public class SI2 {
             Cell cell = (Cell) list.get(0);      
             //Creamos el objeto trabajador. Lo seteamos en cada if
             Trabajador trab=new Trabajador();
-            trab.setId(i);
+            trab.setIdTrabajador(i);
             
             if(cell.getCellTypeEnum() == CellType.STRING){ //El DNI tiene una letra al final
                 String analizedNif = analizamosNif(cell.toString());
@@ -224,13 +229,13 @@ public class SI2 {
             Cell cellApe1= (Cell) list.get(1);
             Cell cellApe2= (Cell) list.get(2);
             Cell cellNom= (Cell) list.get(3);
-            Cell cellEmpr= (Cell) list.get(6);
+            Cell cellEmpr= (Cell) list.get(7);
             Cell cuenta = (Cell) list.get(14);
             Cell pais = (Cell) list.get(15);
             Cell cellCategoria = (Cell) list.get(5);
             Cell prorrata = (Cell) list.get(13);
             Cell fechaAlta = (Cell) list.get(8);
-            Cell cellCifEmpr = (Cell) list.get(7);
+            Cell cellCifEmpr = (Cell) list.get(6);
             
             
             if(cuenta.getCellTypeEnum()==CellType.STRING && pais.getCellTypeEnum()==CellType.STRING){
@@ -259,11 +264,17 @@ public class SI2 {
                 Empresa empr = new Empresa(nombreEmpresa, cifEmpresa);
                 trab.setEmpresa(empr);
                 //TODO añadir direccion
-                
-                for(Empresa empresa:listaEmpresas){
-                    if(!empresa.getNombre().equals(nombreEmpresa)){
-                        listaEmpresas.add(new Empresa(nombreEmpresa, cifEmpresa));
+                if(listaEmpresas.isEmpty()){
+                    listaEmpresas.add(empr);
+                }else{
+                    boolean contenido = false;
+                    for(Empresa empresa:listaEmpresas){
+                        if(empresa.getNombre().equals(nombreEmpresa)){
+                            contenido = true;
+                        }
                     }
+                    if(!contenido)
+                        listaEmpresas.add(empr);
                 }
                 //trab.setEmpresa(empr.getIdEmpresa());
                 
@@ -276,10 +287,11 @@ public class SI2 {
                 
                 apellido1=cellApe1.toString();
                 trab.setApellido1(apellido1);
+                trab.setApellido2(apellido2);
                 nombre=cellNom.toString();
                 trab.setNombre(nombre);
                 
-                String correo=trab.calculaCorreo(nombre, apellido1.toLowerCase(), apellido2.toLowerCase(), nombreEmpresa.toLowerCase());
+                String correo=trab.calculaCorreo(nombre.toLowerCase(), apellido1.toLowerCase(), apellido2.toLowerCase(), nombreEmpresa.toLowerCase());
                 trab.setCorreo(correo);
                 String prort = prorrata.toString();
                 if(prort.equals("NO")){
@@ -532,118 +544,118 @@ public class SI2 {
     
    
 
-    private static void calcularNominas(String fecha, List sheetData2, ArrayList<Trabajador> listaTrabajadores) {
+    private static void calcularNominas(String fecha, List sheetData2) {
         
-        Nomina nomi;
+        model.Nomina nomi;
         int count=0;
         for(Trabajador trab : listaTrabajadores){
-            count++;;
-            nomi= new Nomina(); 
-            nomi.setIdTrabajador(trab.getId());
-            nomi.setIdNomina(count);
-            nomi.setMes(Integer.valueOf(fecha.substring(0,2)));
-            nomi.setAnio(Integer.valueOf(fecha.substring(3,7)));
-            nomi.setNumeroTrienios(trab.getnTrienios());
             
-            //Calculamos Trabajador 
-            for(int i = 1; i< sheetData2.size(); i++){
-                List list = (List) sheetData2.get(i);
-                Cell complementCell= (Cell) list.get(2);
-                Cell salarCell = (Cell) list.get(1);
-                Cell categCell = (Cell) list.get(0);
-                if((listaCategorias.get((trab.getCategoria().getIdCategoria())-1).nombreCategoria).equals(categCell.toString())){
-                    nomi.setBrutoAnual(Double.parseDouble(salarCell.toString()));
-                    nomi.setImporteComplementoMes(Double.parseDouble(complementCell.toString())/14);
-                    nomi.setImporteSalarioMes(Double.parseDouble(salarCell.toString())/14);
-                    break;
+            if(trab.getDNI() != null){
+                count++;;
+                nomi= new Nomina(); 
+                nomi.setTrabajador(trab);
+                nomi.setIdNomina(count);
+                nomi.setMes(Integer.valueOf(fecha.substring(0,2)));
+                nomi.setAnio(Integer.valueOf(fecha.substring(3,7)));
+                nomi.setNumeroTrienios(trab.getnTrienios());
+
+                //Calculamos Trabajador 
+                for(int i = 1; i< sheetData2.size(); i++){
+                    List list = (List) sheetData2.get(i);
+                    Cell complementCell= (Cell) list.get(2);
+                    Cell salarCell = (Cell) list.get(1);
+                    Cell categCell = (Cell) list.get(0);
+                    if((listaCategorias.get((trab.getCategoria().getIdCategoria())-1).nombreCategoria).equals(categCell.toString())){
+                        nomi.setBrutoAnual(Double.parseDouble(salarCell.toString()));
+                        nomi.setImporteComplementoMes(Double.parseDouble(complementCell.toString())/14);
+                        nomi.setImporteSalarioMes(Double.parseDouble(salarCell.toString())/14);
+                        break;
+                    }
+
+
                 }
-                
-                
-            }
-            //Calculamos la cantidad de los trienios
-            for(int i=18;i<36;i++){
-                List list= (List) sheetData2.get(i);
-                Cell nTriCell=(Cell) list.get(3);
-                Cell cantTriCell=(Cell) list.get(4);
-                if(nomi.getNumeroTrienios()==Double.valueOf(nTriCell.toString())){
-                    nomi.setImporteTrienios(Double.valueOf(cantTriCell.toString()));
+                //Calculamos la cantidad de los trienios
+                for(int i=18;i<36;i++){
+                    List list= (List) sheetData2.get(i);
+                    Cell nTriCell=(Cell) list.get(3);
+                    Cell cantTriCell=(Cell) list.get(4);
+                    if(nomi.getNumeroTrienios()==Double.valueOf(nTriCell.toString())){
+                        nomi.setImporteTrienios(Double.valueOf(cantTriCell.toString()));
+                    }
                 }
-            }
-            for(int i=49;i>0;i--){
-                List list = (List) sheetData2.get(i);
-                Cell brutoCell = (Cell) list.get(5);
-                Cell IRPFCell = (Cell) list.get(6);
-                boolean encontrado=false;
-                if(nomi.getBrutoAnual()>Double.parseDouble(brutoCell.toString())){
+                for(int i=49;i>0;i--){
+                    List list = (List) sheetData2.get(i);
+                    Cell brutoCell = (Cell) list.get(5);
+                    Cell IRPFCell = (Cell) list.get(6);
+                    boolean encontrado=false;
+                    if(nomi.getBrutoAnual()>Double.parseDouble(brutoCell.toString())){
+                    }
+                    else{
+                        if(!encontrado){
+                            nomi.setIRPF(Double.valueOf(IRPFCell.toString()));
+                            encontrado=true;
+                        }
+
+                    }
+                }
+                //Calculamos si lo prorratea o no. 
+
+                //SI el trabajador tiene prorrateo...
+                if(trab.isProrrateo()){
+                    nomi.setValorProrrateo(nomi.importeSalarioMes/6);
                 }
                 else{
-                    if(!encontrado){
-                        nomi.setIRPF(Double.valueOf(IRPFCell.toString()));
-                        encontrado=true;
-                    }
-                   
+                    nomi.setValorProrrateo(0);
                 }
+                nomi.setImporteIRPF(nomi.brutoAnual*nomi.getIRPF()/100);
+
+                //TODO COMPROBAR ESTOS
+
+                List listCuotaO=(List) sheetData2.get(17);
+                List listDesempleoT=(List) sheetData2.get(18);
+                List listFormacionT=(List) sheetData2.get(19);
+                nomi.setSeguridadSocialTrabajador(Double.parseDouble(listCuotaO.get(1).toString()));
+                nomi.setImporteSeguridadSocialTrabajador(nomi.getImporteSalarioMes()*nomi.getSeguridadSocialTrabajador()/100);
+                nomi.setDesempleoTrabajador(Double.parseDouble(listDesempleoT.get(1).toString()));
+                nomi.setImporteDesempleoTrabajador(nomi.getImporteSalarioMes()*nomi.getDesempleoTrabajador()/100);
+                nomi.setFormacionTrabajador(Double.parseDouble(listFormacionT.get(1).toString()));
+                nomi.setImporteFormacionTrabajador(nomi.getImporteSalarioMes()*nomi.getImporteFormacionTrabajador()/100);
+
+
+
+
+                //EMPRESARIO
+                List listSS=(List) sheetData2.get(20);
+                List listFOGASA=(List) sheetData2.get(21);
+                List listDesempleo=(List) sheetData2.get(22);
+                List listFormacion=(List) sheetData2.get(23);
+                List listAccidentes=(List) sheetData2.get(24);
+                nomi.setBaseEmpresario(nomi.getBrutoAnual()/12);
+                nomi.setSeguridadSocialEmpresario(Double.parseDouble(listSS.get(1).toString()));
+                nomi.setImporteSeguridadSocialEmpresario(nomi.getBaseEmpresario()*nomi.getSeguridadSocialEmpresario()/100);
+                nomi.setDesempleoEmpresario(Double.parseDouble(listDesempleo.get(1).toString()));
+                nomi.setImporteDesempleoEmpresario(nomi.getBaseEmpresario()*nomi.getDesempleoEmpresario()/100);
+                nomi.setFormacionEmpresario(Double.parseDouble(listFormacion.get(1).toString()));
+                nomi.setImporteFormacionEmpresario(nomi.getBaseEmpresario()*nomi.getFormacionEmpresario()/100);
+                nomi.setAccidentesTrabajoEmpresario(Double.parseDouble(listAccidentes.get(1).toString()));
+                nomi.setImporteAccidentesTrabajo(nomi.getBaseEmpresario()*nomi.getAccidentesTrabajoEmpresario()/100);
+                nomi.setFOGASAEmpresario(Double.parseDouble(listFOGASA.get(1).toString()));
+                nomi.setImporteFOGASAEmpresario(nomi.getBaseEmpresario()*nomi.getFOGASAEmpresario()/100);
+
+                //FINAL
+
+                nomi.setBrutoNomina(nomi.getImporteSalarioMes()+nomi.getImporteTrienios()+nomi.getImporteComplementoMes()+nomi.getValorProrrateo());
+                nomi.setLiquidoNomina(nomi.getBrutoNomina()-(nomi.getImporteDesempleoTrabajador()+nomi.getImporteFormacionTrabajador()+nomi.getImporteSeguridadSocialTrabajador()+nomi.getImporteIRPF()));
+                nomi.setCosteTotalEmpresario(nomi.getImporteDesempleoEmpresario()+nomi.getImporteFOGASAEmpresario()+nomi.getImporteFormacionEmpresario()+nomi.getImporteSeguridadSocialEmpresario());
+
+
+                listaNominas.add(nomi);
+                System.out.println(nomi.toString());
             }
-            //Calculamos si lo prorratea o no. 
-            
-            //SI el trabajador tiene prorrateo...
-            if(trab.isProrrateo()){
-                nomi.setValorProrrateo(nomi.importeSalarioMes/6);
-            }
-            else{
-                nomi.setValorProrrateo(0);
-            }
-            nomi.setImporteIRPF(nomi.brutoAnual*nomi.getIRPF()/100);
-            
-            //TODO COMPROBAR ESTOS
-            
-            List listCuotaO=(List) sheetData2.get(17);
-            List listDesempleoT=(List) sheetData2.get(18);
-            List listFormacionT=(List) sheetData2.get(19);
-            nomi.setSeguridadSocialTrabajador(Double.parseDouble(listCuotaO.get(1).toString()));
-            nomi.setImporteSeguridadSocialTrabajador(nomi.getImporteSalarioMes()*nomi.getSeguridadSocialTrabajador()/100);
-            nomi.setDesempleoTrabajador(Double.parseDouble(listDesempleoT.get(1).toString()));
-            nomi.setImporteDesempleoTrabajador(nomi.getImporteSalarioMes()*nomi.getDesempleoTrabajador()/100);
-            nomi.setFormacionTrabajador(Double.parseDouble(listFormacionT.get(1).toString()));
-            nomi.setImporteFormacionTrabajador(nomi.getImporteSalarioMes()*nomi.getImporteFormacionTrabajador()/100);
-            
-                
-            
-            
-            //EMPRESARIO
-            List listSS=(List) sheetData2.get(20);
-            List listFOGASA=(List) sheetData2.get(21);
-            List listDesempleo=(List) sheetData2.get(22);
-            List listFormacion=(List) sheetData2.get(23);
-            List listAccidentes=(List) sheetData2.get(24);
-            nomi.setBaseEmpresario(nomi.getBrutoAnual()/12);
-            nomi.setSeguridadSocialEmpresario(Double.parseDouble(listSS.get(1).toString()));
-            nomi.setImporteSeguridadSocialEmpresario(nomi.getBaseEmpresario()*nomi.getSeguridadSocialEmpresario()/100);
-            nomi.setDesempleoEmpresario(Double.parseDouble(listDesempleo.get(1).toString()));
-            nomi.setImporteDesempleoEmpresario(nomi.getBaseEmpresario()*nomi.getDesempleoEmpresario()/100);
-            nomi.setFormacionEmpresario(Double.parseDouble(listFormacion.get(1).toString()));
-            nomi.setImporteFormacionEmpresario(nomi.getBaseEmpresario()*nomi.getFormacionEmpresario()/100);
-            nomi.setAccidentesTrabajoEmpresario(Double.parseDouble(listAccidentes.get(1).toString()));
-            nomi.setImporteAccidentesTrabajo(nomi.getBaseEmpresario()*nomi.getAccidentesTrabajoEmpresario()/100);
-            nomi.setFOGASAEmpresario(Double.parseDouble(listFOGASA.get(1).toString()));
-            nomi.setImporteFOGASAEmpresario(nomi.getBaseEmpresario()*nomi.getFOGASAEmpresario()/100);
-            
-            //FINAL
-            
-            nomi.setBrutoNomina(nomi.getImporteSalarioMes()+nomi.getImporteTrienios()+nomi.getImporteComplementoMes()+nomi.getValorProrrateo());
-            nomi.setLiquidoNomina(nomi.getBrutoNomina()-(nomi.getImporteDesempleoTrabajador()+nomi.getImporteFormacionTrabajador()+nomi.getImporteSeguridadSocialTrabajador()+nomi.getImporteIRPF()));
-            nomi.setCosteTotalEmpresario(nomi.getImporteDesempleoEmpresario()+nomi.getImporteFOGASAEmpresario()+nomi.getImporteFormacionEmpresario()+nomi.getImporteSeguridadSocialEmpresario());
-            
-            
-            listaNominas.add(nomi);
-            
-            
         }
         
         
-        //TODO INSERTAR OBJETOS EN BBDD
-        
-        //EN ORDEN, PRIMERO LOS QUE NO DEOENDEN DE NADIE
+
         
         
         

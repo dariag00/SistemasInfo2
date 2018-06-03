@@ -3,11 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package SI2;
+package model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -18,8 +17,6 @@ import java.util.ArrayList;
 public class Trabajador {
     
     private int idTrabajador;
-
-    
     private String nombre;
     private String apellido1;
     private String apellido2;
@@ -28,16 +25,16 @@ public class Trabajador {
     private Date fechaAltaEmpresa;
     private String cuenta;
     private String iban;
-    
     private Categoria categoria;
     private Empresa empresa;
     private boolean prorrateo;
     private static ArrayList<Nomina> listaNominasTrabajador;
+    private static ArrayList<String> correos;
     
         
     public Trabajador(){
         this.apellido2 = "";
-        this.listaNominasTrabajador=new ArrayList<>();
+        Trabajador.listaNominasTrabajador=new ArrayList<>();
         
         correos=new ArrayList<>();
     }
@@ -101,19 +98,7 @@ public class Trabajador {
 
     public static void setCorreos(ArrayList<String> correos) {
         Trabajador.correos = correos;
-    }
-
-    private static ArrayList<String> correos; 
-    
-
-    
-    public void setId(int id){
-        this.idTrabajador = id;
-    }
-    
-    public int getId(){
-        return idTrabajador;
-    }
+    } 
    
     
     public String getCorreo(){
